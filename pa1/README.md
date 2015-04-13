@@ -1,8 +1,10 @@
 # 8 Puzzle Solver
 ## How to Run
+```Python
 $ python assignment1_p5.py < test.txt
 $ time python assignment1_p5.py < test.txt #test time efficiency
 $ python -m memory_profiler assignment1_p5.py #test memory efficiency
+```
 
 You have to install memory_profiler for the last one to work, you
 can google it to see how to install it.
