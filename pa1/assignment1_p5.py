@@ -11,9 +11,21 @@ from math import factorial
 from Queue import PriorityQueue
 from memory_profiler import profile
 
+def makeSolution(board):
+    global solutionBoard
+    horizontal = len(board)
+    vertical = len(board[0])
+
+    solutionBoard = [[0 for z in range(vertical)] for w in range(horizontal)]
+
+    curr = 0
+    for x in range(horizontal):
+        for y in range(vertical):
+            solutionBoard[x][y] = curr
+            curr = curr + 1
+
 #Finds the '0' or empty space of the board, and updates the global row and column variables
 #Ouput: True if a 0 was found, False otherwise
-@profile
 def findEmptySpace(board):
     global row, column, configs
 
@@ -32,7 +44,6 @@ def findEmptySpace(board):
 
 #checks if the board is in a "solved" state
 #Output: True if board is solved
-@profile
 def is_complete(board):
     #Check if solved
     curr = 0
@@ -46,7 +57,6 @@ def is_complete(board):
 #A* search algorithm that searches all possible sets of moves until it finds the combination that gives
 #   the board a "solved" state. Uses a Manhattan distance heuristic
 #Output: A string of moves for the solution if found
-@profile
 def aStar(board):
     import sys
     global boardList, q, legal, configs, foundConfigs
@@ -68,6 +78,7 @@ def aStar(board):
     enqueueMoves(board)     #add initial moves to queue
     while(q.empty() != True):
         move = q.get()[1]
+        print("Got from queue: ", move)
         for action in allMoves:
             legal = True
             newMove = move + action
@@ -77,7 +88,6 @@ def aStar(board):
             if(inList(newBoard, boardList) == False and legal == True): #reached a new board with legal moves
                     foundConfigs = foundConfigs + 1
                     if(is_complete(newBoard)):
-                        print(newMove)
                         sys.exit()
                     if(foundConfigs >= configs):    #found all solvable board configurations
                         print("UNSOLVABLE")
@@ -89,26 +99,23 @@ def aStar(board):
 #Heuristic function that determines how close the board is to the "solved" board
 #   based on how far each number is from their correct box
 #Output: The heuristic value of the board, integer
-@profile
-def findSimilarity(board):
-    global OriginalBoard
-    vertical = len(board[0])
-    horizontal = len(board)
-    newBoard = [[0 for z in range(vertical)] for w in range(horizontal)]
+def findSimilarity(newBoard):
+    global solutionBoard
+    vertical = len(newBoard[0])
+    horizontal = len(newBoard)
 
     priority = 0
     for x in range(horizontal):  #loop through rows
         for y in range(vertical):        #loop through columns
-               if(newBoard[x][y] != board[x][y]):
-                   thisLoc = (x,y)                                      #location of this value
-                   trueLoc = getCoordinates(board, newBoard[x][y])      #get true location of this value
+               if(newBoard[x][y] != solutionBoard[x][y]):
+                   thisLoc = (x,y)                                      #location of this value in newBoard
+                   trueLoc = getCoordinates(solutionBoard, newBoard[x][y])      #get true location of this value
                    priority = priority + abs(thisLoc[0] - trueLoc[0]) + abs(thisLoc[1] - trueLoc[1]) #distance
 
     return priority
 
 #Finds the coordinates for a given number in a board
 #Output: None
-@profile
 def getCoordinates(board, number):
     vertical = len(board[0])
     horizontal = len(board)
@@ -119,7 +126,6 @@ def getCoordinates(board, number):
 
 #Reverts the board back to the original (the one from the input parameters)
 #Output: The original board
-@profile
 def resetBoard(board):
     horizontal = len(board)
     vertical = len(board[0])
@@ -133,7 +139,6 @@ def resetBoard(board):
 
 #Checks if newBoard is in the boardList
 #Output: True if in boardList, otherwise False
-@profile
 def inList(newBoard, boardList):
     horizontal = len(newBoard)
     vertical = len(newBoard[0])
@@ -156,12 +161,9 @@ def inList(newBoard, boardList):
 
 #Performs a set of moves on the board, but ignores illegal moves or redundant moves
 #Output:the resulting board from performing the moves
-@profile
 def doMoves(boardCopy,newMove):
     import sys
-    global legal
-    global row
-    global column
+    global legal, row, column
 
     prev = "null"
     for move in newMove:
@@ -202,7 +204,6 @@ def doMoves(boardCopy,newMove):
 
 #Inserts the inital set of moves into the queue
 #Output: the queue with the legal initial moves inserted
-@profile
 def enqueueMoves(board):
     import sys
     global boardList, foundConfigs, row, column, q
@@ -252,7 +253,6 @@ def enqueueMoves(board):
 
 #Add the board to boardList
 #Output: None
-@profile
 def addtoList(board):
     global boardList
     horizontal = len(board)
@@ -267,7 +267,6 @@ def addtoList(board):
 
 #Moves the empty space up, if legal
 #Output: True if legal move, False otherwise
-@profile
 def moveUp(board):
     global row, column
 
@@ -282,7 +281,6 @@ def moveUp(board):
 
 #Moves the empty space down, if legal
 #Output: True if legal move, False otherwise
-@profile
 def moveDown(board):
     global row, column
 
@@ -297,7 +295,6 @@ def moveDown(board):
 
 #Moves the empty space left, if legal
 #Output: True if legal move, False otherwise
-@profile
 def moveLeft(board):
     global row, column
     if(column != 0): #check if we are moving left from the left edge of the puzzle
@@ -310,7 +307,6 @@ def moveLeft(board):
 
 #Moves the empty space right, if legal
 #Output: True if legal move, False otherwise
-@profile
 def moveRight(board):
     global row, column
 
@@ -324,7 +320,6 @@ def moveRight(board):
 
 #saves copy of the original board to a global variable
 #Output: none
-@profile
 def storeCopy(board):
     global OriginalBoard
     horizontal = len(board)
@@ -335,7 +330,6 @@ def storeCopy(board):
                OriginalBoard[x][y] = board[x][y]
 
 #MAIN
-@profile
 def main():
     import sys
     global OriginalBoard
@@ -354,6 +348,8 @@ def main():
     OriginalBoard = [[0 for z in range(vertical)] for w in range(horizontal)]
 
     storeCopy(board)    #make copy of original board
+
+    makeSolution(board)
 
     aStar(board)    #perform A* seach on board
 
