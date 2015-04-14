@@ -11,12 +11,15 @@ from math import factorial
 from Queue import PriorityQueue
 from memory_profiler import profile
 
+#Makes a board of what the mxn solution to the puzzle should be
+#Input: A board that you want to find the solution board to
+#Output: What the solution board should be
 def makeSolution(board):
     global solutionBoard
     horizontal = len(board)
     vertical = len(board[0])
 
-    solutionBoard = [[0 for z in range(vertical)] for w in range(horizontal)]
+    solutionBoard = [[0 for z in range(vertical)] for w in range(horizontal)] #initialize board
 
     curr = 0
     for x in range(horizontal):
