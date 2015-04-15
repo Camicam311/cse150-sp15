@@ -1,8 +1,10 @@
-#CSE 150 Programming assignment 1, problem 4
-#Student Name: Rene Sanchez
-#ID: A11866286
-#Description: Reads an nxm n-puzzle from a .csv file and solves the
-# puzzle using a A* traversal algorithm with a Manhattan-distance heuristic
+'''
+CSE 150 Programming assignment 1, problem 5
+Student Name: Rene Sanchez
+ID: A11866286
+Description: Reads an nxm n-puzzle from a .csv file and solves the
+ puzzle using a A* traversal algorithm with a Manhattan-distance heuristic
+'''
 
 __author__ = 'risanche@ucsd.edu'
 
@@ -11,9 +13,11 @@ from math import factorial
 from Queue import PriorityQueue
 from memory_profiler import profile
 
-#Makes a board of what the mxn solution to the puzzle should be
-#Input: A board that you want to find the solution board to
-#Output: What the solution board should be
+'''
+Makes a board of what the mxn solution to the puzzle should be
+Input: A board that you want to find the solution board to
+Output: What the solution board should be
+'''
 def makeSolution(board):
     global solutionBoard
     horizontal = len(board)
@@ -34,6 +38,9 @@ def findEmptySpace(board):
 
     horizontal = len(board)
     vertical = len(board[0])
+    # TODO: Are we guaranteed the board won't be jagged/will be valid? 
+    # What if the gap is in first collumn?
+
     size = horizontal*vertical - 1
     config = (factorial(size))/2
 
@@ -50,11 +57,13 @@ def findEmptySpace(board):
 def is_complete(board):
     #Check if solved
     curr = 0
+    global foundConfigs
     for row in board:  #loop through rows
         for number in row:        #loop through columns
             if(number != curr):
                 return False      #the puzzle isn't ordered correctly
             curr = curr + 1
+    print foundConfigs
     return True
 
 #A* search algorithm that searches all possible sets of moves until it finds the combination that gives
@@ -81,7 +90,6 @@ def aStar(board):
     enqueueMoves(board)     #add initial moves to queue
     while(q.empty() != True):
         move = q.get()[1]
-        print("Got from queue: ", move)
         for action in allMoves:
             legal = True
             newMove = move + action

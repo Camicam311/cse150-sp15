@@ -46,11 +46,13 @@ def storeCopy(board):
 def is_complete(board):
     #Check if solved
     curr = 0
+    global counter
     for row in board:  #loop through rows
         for number in row:        #loop through columns
             if(number != curr):
                 return False      #the puzzle isn't ordered correctly
             curr = curr + 1
+    print counter
     return True
 
 #Iterative Deepening Seach algorithm that
@@ -72,6 +74,8 @@ def DLS(board, maxLimit):
     allMoves = ["U","D","L","R"]
     currMove = ""
     stack.insert(0, currMove)
+    global counter
+    counter = 1
     while(len(stack) != 0):   #stack isn't empty
         stackMove = stack.pop(0)
         for move in allMoves:
@@ -86,6 +90,7 @@ def DLS(board, maxLimit):
                     sys.exit()
                 if(legal == True and len(currMove) < maxLimit): #if not over limit and legal moves
                     stack.insert(0,currMove)
+                    counter += 1
 
 
 #Reverts the board back to the original (the one from the input parameters)
@@ -148,6 +153,7 @@ def doMoves(boardCopy,newMove):
 
 #Inserts the inital set of moves into the queue
 #Output: the queue with the legal initial moves inserted
+'''
 def enqueueMoves(board):
     import sys
     global row
@@ -189,6 +195,7 @@ def enqueueMoves(board):
 
     return stack
 
+'''
 #Add the board to boardList
 #Output: None
 def addtoList(board):

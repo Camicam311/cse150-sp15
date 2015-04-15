@@ -30,12 +30,14 @@ def findEmptySpace(board):
 #checks if the board is in a "solved" state
 #Output: True if board is solved
 def is_complete(board):
+    global foundConfigs
     curr = 0
     for row in board:  #loop through rows
         for number in row:        #loop through columns
             if(number != curr):
                 return False      #the puzzle isn't ordered correctly
             curr = curr + 1
+    print foundConfigs
     return True
 
 #Breath First Search algorithm that searches all possible sets of moves until it finds the combination that gives

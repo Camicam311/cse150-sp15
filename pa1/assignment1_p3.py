@@ -43,11 +43,13 @@ def storeCopy(board):
 #Output: True if board is solved
 def is_complete(board):
     curr = 0
+    global counter
     for row in board:  #loop through rows
         for number in row:        #loop through columns
             if(number != curr):
                 return False      #the puzzle isn't ordered correctly
             curr = curr + 1
+    print counter
     return True
 
 #Depth Limited Seach algorithm that searches all possible sets of moves until it finds the combination that gives
@@ -63,6 +65,8 @@ def DLS(board):
     allMoves = ["U","D","L","R"]
     currMove = ""
     stack.insert(0,currMove)
+    global counter
+    counter = 1
     while(len(stack) != 0):   #stack isn't empty
         stackMove = stack.pop(0)    #get front element
         for move in allMoves:
@@ -77,6 +81,7 @@ def DLS(board):
                     sys.exit()
                 if(legal == True and len(currMove) < maxLimit): #if not over limit and legal moves
                     stack.insert(0,currMove)
+                    counter += 1
     print("UNSOLVABLE")
 
 #Reverts the board back to the original (the one from the input parameters)
