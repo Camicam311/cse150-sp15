@@ -1,3 +1,6 @@
+from guppy import hpy
+
+
 '''
 CSE 150 Programming assignment 1, problem 5
 Student Name: Rene Sanchez
@@ -12,6 +15,9 @@ from signal import signal, SIGPIPE, SIG_DFL
 from math import factorial
 from Queue import PriorityQueue
 from memory_profiler import profile
+
+global max_size
+max_size = 0
 
 '''
 Makes a board of what the mxn solution to the puzzle should be
@@ -71,7 +77,7 @@ def is_complete(board):
 #Output: A string of moves for the solution if found
 def aStar(board):
     import sys
-    global boardList, q, legal, configs, foundConfigs
+    global boardList, q, legal, configs, foundConfigs, max_size
 
     horizontal = len(board)
     vertical = len(board[0])
@@ -102,10 +108,19 @@ def aStar(board):
                         sys.exit()
                     if(foundConfigs >= configs):    #found all solvable board configurations
                         print("UNSOLVABLE")
+                        print h.heap()
+                        print max_size
                         sys.exit()
                     addtoList(newBoard)
                     q.put((len(newMove) + findSimilarity(newBoard),newMove))    #add word to queue
+                    l = []
+                    for elem in list(q.queue):
+                        l+=elem
+                    print l
+                    max_size = max(q.qsize(),max_size)
     print("UNSOLVABLE")
+    print h.heap()
+    print max_size
 
 #Heuristic function that determines how close the board is to the "solved" board
 #   based on how far each number is from their correct box
@@ -138,15 +153,15 @@ def getCoordinates(board, number):
 #Reverts the board back to the original (the one from the input parameters)
 #Output: The original board
 def resetBoard(board):
-    horizontal = len(board)
-    vertical = len(board[0])
-    newBoard = [[0 for z in range(vertical)] for w in range(horizontal)]
+    global OriginalBoard
+    horizontal = len(OriginalBoard)
+    vertical = len(OriginalBoard[0])
 
     for x in range(horizontal):  #loop through rows
         for y in range(vertical):        #loop through columns
-               newBoard[x][y] = board[x][y]
+               board[x][y] = OriginalBoard[x][y]
 
-    return newBoard
+    return board
 
 #Checks if newBoard is in the boardList
 #Output: True if in boardList, otherwise False
@@ -209,6 +224,9 @@ def doMoves(boardCopy,newMove):
 
         if(is_complete(boardCopy)):
             print(newMove)
+            print h.heap()
+            global max_size
+            print max_size
             sys.exit()
 
     return boardCopy
@@ -217,7 +235,7 @@ def doMoves(boardCopy,newMove):
 #Output: the queue with the legal initial moves inserted
 def enqueueMoves(board):
     import sys
-    global boardList, foundConfigs, row, column, q
+    global boardList, foundConfigs, row, column, q, max_size
 
     if(row != 0):
         moveUp(board)
@@ -225,6 +243,7 @@ def enqueueMoves(board):
             print("U")
             sys.exit()
         q.put((1 + findSimilarity(board),"U"))
+        max_size = max(q.qsize(),max_size)
         addtoList(board)
         moveDown(board)
         foundConfigs = foundConfigs + 1
@@ -235,6 +254,7 @@ def enqueueMoves(board):
             print("D")
             sys.exit()
         q.put((1 + findSimilarity(board),"D"))
+        max_size = max(q.qsize(),max_size)
         addtoList(board)
         moveUp(board)
         foundConfigs = foundConfigs + 1
@@ -245,6 +265,7 @@ def enqueueMoves(board):
             print("L")
             sys.exit()
         q.put((1 + findSimilarity(board),"L"))
+        max_size = max(q.qsize(),max_size)
         addtoList(board)
         moveRight(board)
 
@@ -256,6 +277,7 @@ def enqueueMoves(board):
             print("R")
             sys.exit()
         q.put((1 + findSimilarity(board),"R"))
+        max_size = max(q.qsize(),max_size)
         addtoList(board)
         moveLeft(board)
         foundConfigs = foundConfigs + 1
@@ -341,6 +363,7 @@ def storeCopy(board):
                OriginalBoard[x][y] = board[x][y]
 
 #MAIN
+
 def main():
     import sys
     global OriginalBoard
@@ -365,6 +388,7 @@ def main():
     aStar(board)    #perform A* seach on board
 
 if __name__ == "__main__":
+    h=hpy()
     main()
 
 

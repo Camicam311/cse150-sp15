@@ -8,7 +8,7 @@ for filename in [x for x in os.listdir(".") if '.py' in x]:
         continue
     for test in [x for x in os.listdir("tests") if '.txt' in x]:
         print (filename + " " +  test)
-        os.system("python " + filename + "< tests/" + test)
+        os.system("time python " + filename + "< tests/" + test)
         print ""
     
 

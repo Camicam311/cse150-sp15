@@ -4,10 +4,15 @@
 #Description: Reads an nxm n-puzzle from a .csv file and solves the
 # puzzle using a Bread-First-Search traversal algorithm
 
+from guppy import hpy
+
 __author__ = 'risanche@ucsd.edu'
 import Queue
 from signal import signal, SIGPIPE, SIG_DFL
 from math import factorial
+
+global max_size 
+max_size = 0
 
 #Finds the '0' or empty space of the board, and updates the global row and column variables
 #Ouput: True if a 0 was found, False otherwise
@@ -58,8 +63,11 @@ def BFS(board):
     allMoves = ["U","D","L","R"]
     boardList = []                  #keeps track of past boards reached
     boardList.append(board)
+    global max_size
     if is_complete(board):
         print("Board is already solved, no moves needed")
+        print h.heap() 
+        print max_size
         return True
     q = Queue.Queue()
     findEmptySpace(board)
@@ -76,24 +84,30 @@ def BFS(board):
                     foundConfigs = foundConfigs + 1
                     if(foundConfigs >= configs):    #if we have found all solvable boards
                         print("UNSOLVABLE")
+                        print h.heap() 
+                        print max_size
                         sys.exit()
                     addtoList(newBoard) #add board to list of newly reached boards
                     q.put(newMove)
+                    max_size = max(q.qsize(),max_size)
+
 
     print("UNSOLVABLE")
+    print h.heap() 
+    print max_size
 
 #Reverts the board back to the original (the one from the input parameters)
 #Output: The original board
 def resetBoard(board):
-    horizontal = len(board)
-    vertical = len(board[0])
-    newBoard = [[0 for z in range(vertical)] for w in range(horizontal)]
+    global OriginalBoard
+    horizontal = len(OriginalBoard)
+    vertical = len(OriginalBoard[0])
 
     for x in range(horizontal):  #loop through rows
         for y in range(vertical):        #loop through columns
-               newBoard[x][y] = board[x][y]
+               board[x][y] = OriginalBoard[x][y]
 
-    return newBoard
+    return board
 
 #Checks if newBoard is in the boardList
 #Output: True if in boardList, otherwise False
@@ -156,6 +170,8 @@ def doMoves(boardCopy,newMove):
 
         if(is_complete(boardCopy)):
             print(newMove)
+            print h.heap() 
+            print max_size
             sys.exit()
 
     return boardCopy
@@ -164,14 +180,17 @@ def doMoves(boardCopy,newMove):
 #Output: the queue with the legal initial moves inserted
 def enqueueMoves(board,q):
     import sys
-    global boardList, foundConfigs, row, column
+    global boardList, foundConfigs, row, column, max_size
 
     if(row != 0):
         moveUp(board)
         if(is_complete(board)):
             print("U")
+            print h.heap() 
+            print max_size
             sys.exit()
         q.put("U")
+        max_size = max(q.qsize(),max_size)
         addtoList(board)
         moveDown(board)
         foundConfigs = foundConfigs + 1
@@ -180,8 +199,11 @@ def enqueueMoves(board,q):
         moveDown(board)
         if(is_complete(board)):
             print("D")
+            print h.heap() 
+            print max_size
             sys.exit()
         q.put("D")
+        max_size = max(q.qsize(),max_size)
         addtoList(board)
         moveUp(board)
         foundConfigs = foundConfigs + 1
@@ -190,8 +212,11 @@ def enqueueMoves(board,q):
         moveLeft(board)
         if(is_complete(board)):
             print("L")
+            print h.heap() 
+            print max_size
             sys.exit()
         q.put("L")
+        max_size = max(q.qsize(),max_size)
         addtoList(board)
         moveRight(board)
 
@@ -201,8 +226,11 @@ def enqueueMoves(board,q):
         moveRight(board)
         if(is_complete(board)):
             print("R")
+            print h.heap() 
+            print max_size
             sys.exit()
         q.put("R")
+        max_size = max(q.qsize(),max_size)
         addtoList(board)
         moveLeft(board)
         foundConfigs = foundConfigs + 1
@@ -277,21 +305,37 @@ def moveRight(board):
         return True
     return False
 
+def storeCopy(board):
+    global OriginalBoard
+    horizontal = len(board)
+    vertical = len(board[0])
+
+    for x in range(horizontal):  #loop through rows
+        for y in range(vertical):        #loop through columns
+               OriginalBoard[x][y] = board[x][y]
+
 #MAIN
 def main():
     import sys
+    global OriginalBoard
     #read the input parameters and save the board into a 2d matrix
     board = [[int(n.strip()) for n in line.split(',')] for line in sys.stdin.readlines()]
+    horizontal = len(board)
+    vertical = len(board[0])
+    OriginalBoard = [[0 for z in range(vertical)] for w in range(horizontal)]
     if(findEmptySpace(board) == False):
         print("Invalid board given, has no empty space")
         return
 
     if(is_complete(board)): #if already solved
+        print h.heap() 
+        print max_size
         sys.exit()
-
+    storeCopy(board)
     BFS(board)  #Perform Breath First Search on board
 
 if __name__ == "__main__":
+    h=hpy()
     main()
 
 

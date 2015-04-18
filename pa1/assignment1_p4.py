@@ -8,17 +8,20 @@ __author__ = 'risanche@ucsd.edu'
 from multiprocessing import Queue
 from signal import signal, SIGPIPE, SIG_DFL
 from math import factorial
+from guppy import hpy
+
+global max_size
+max_size = 0
 
 #Finds the '0' or empty space of the board, and updates the global row and column variables
 #Ouput: True if a 0 was found, False otherwise
 def findEmptySpace(board):
-    global row
-    global column
-    global configs
+    global row, column, configs
+
     horizontal = len(board)
     vertical = len(board[0])
     size = horizontal*vertical
-    config = (factorial(size))/2
+    config = (factorial(size))/2    #total number of solvable configurations for board
 
     for x in range(horizontal):  #loop through rows
         for y in range(vertical):        #loop through columns
@@ -58,9 +61,12 @@ def is_complete(board):
 #Iterative Deepening Seach algorithm that
 #Output: "UNSOLVABLE" if IDS doens't find a solution
 def IDS(board):
-    for x in range(2,12): #hard limit is 12
+    for x in range(1,12): #hard limit is 12
         DLS(board, x)
     print("UNSOLVABLE")
+    print h.heap()
+    global max_size
+    print max_size
 
 #Depth Limited Seach algorithm that searches all possible sets of moves until it finds the combination that gives
 #   the board a "solved" state
@@ -90,6 +96,8 @@ def DLS(board, maxLimit):
                     sys.exit()
                 if(legal == True and len(currMove) < maxLimit): #if not over limit and legal moves
                     stack.insert(0,currMove)
+                    global max_size
+                    max_size = max(len(stack),max_size)
                     counter += 1
 
 
@@ -147,6 +155,9 @@ def doMoves(boardCopy,newMove):
 
         if(is_complete(boardCopy)):
             print(newMove)
+            print h.heap()
+            global max_size
+            print max_size
             sys.exit()
 
     return boardCopy
@@ -288,6 +299,7 @@ def main():
     IDS(board)  #Perform iterative deepening search on board
 
 if __name__ == "__main__":
+    h=hpy()
     main()
 
 

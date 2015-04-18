@@ -8,6 +8,10 @@ __author__ = 'risanche@ucsd.edu'
 from multiprocessing import Queue
 from signal import signal, SIGPIPE, SIG_DFL
 from math import factorial
+from guppy import hpy
+
+global max_size
+max_size = 0
 
 #Finds the '0' or empty space of the board, and updates the global row and column variables
 #Ouput: True if a 0 was found, False otherwise
@@ -57,7 +61,7 @@ def is_complete(board):
 #Output: A string of moves for the solution if found, "UNSOLVABLE" otherwise
 def DLS(board):
     import sys
-    global maxLimit, stack, legal
+    global maxLimit, stack, legal, max_size
 
     stack = []
     maxLimit = 5
@@ -78,9 +82,12 @@ def DLS(board):
                 newBoard = doMoves(testBoard, currMove) #do set of moves on original board
                 if(is_complete(newBoard) and legal == True):
                     print(newMove)
+                    print h.heap()
+                    print max_size
                     sys.exit()
                 if(legal == True and len(currMove) < maxLimit): #if not over limit and legal moves
                     stack.insert(0,currMove)
+                    max_size = max(len(stack),max_size)
                     counter += 1
     print("UNSOLVABLE")
 
@@ -136,6 +143,9 @@ def doMoves(boardCopy,newMove):
 
         if(is_complete(boardCopy)):
             print(newMove)
+            print h.heap()
+            global max_size
+            print max_size
             sys.exit()
 
     return boardCopy
@@ -144,13 +154,15 @@ def doMoves(boardCopy,newMove):
 #Output: the queue with the legal initial moves inserted
 def enqueueMoves(board):
     import sys
-    global row, column, stack
+    global row, column, stack, max_size
     stack = []
 
     if(row != 0):
         moveUp(board)
         if(is_complete(board)):
             print("U")
+            print h.heap()
+            print max_size
             sys.exit()
         stack.append("U")
         moveDown(board)
@@ -159,6 +171,8 @@ def enqueueMoves(board):
         moveDown(board)
         if(is_complete(board)):
             print("D")
+            print h.heap()
+            print max_size
             sys.exit()
         stack.append("D")
         moveUp(board)
@@ -167,6 +181,8 @@ def enqueueMoves(board):
         moveLeft(board)
         if(is_complete(board)):
             print("L")
+            print h.heap()
+            print max_size
             sys.exit()
         stack.append("L")
         moveRight(board)
@@ -175,6 +191,8 @@ def enqueueMoves(board):
         moveRight(board)
         if(is_complete(board)):
             print("R")
+            print h.heap()
+            print max_size
             sys.exit()
         stack.append("R")
         moveLeft(board)
@@ -260,6 +278,9 @@ def main():
         return
 
     if(is_complete(board)): #if already solved
+        print h.heap()
+        global max_size
+        print max_size
         sys.exit()
 
     horizontal = len(board)
@@ -271,7 +292,8 @@ def main():
     DLS(board)  #Perform depth limited search on board
 
 if __name__ == "__main__":
+    h=hpy()
     main()
-
-
+    print h.heap()
+    print max_size
 
