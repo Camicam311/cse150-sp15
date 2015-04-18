@@ -5,7 +5,7 @@
 # puzzle using a iterative deepening depth-first traversal algorithm
 
 __author__ = 'risanche@ucsd.edu', 'chriskweller@gmail.com','dvaishna@ucsd.edu'
-from multiprocessing import Queue
+import Queue
 from signal import signal, SIGPIPE, SIG_DFL
 from math import factorial
 

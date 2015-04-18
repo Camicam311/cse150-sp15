@@ -8,8 +8,8 @@ __author__ = 'risanche@ucsd.edu', 'chriskweller@gmail.com','dvaishna@ucsd.edu'
 
 from signal import signal, SIGPIPE, SIG_DFL
 from math import factorial
+import Queue
 from Queue import PriorityQueue
-from memory_profiler import profile
 
 #Makes a board of what the mxn solution to the puzzle should be
 #Input: A mxn 2d array "board" that you want to find the solution board to
