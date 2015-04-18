@@ -134,13 +134,15 @@ def getCoordinates(board, number):
 #Input: An mxn 2d array "board" in which moves have been performed.
 #Output: The original board (the one from the input parameter).
 def resetBoard(board):
+    global OriginalBoard
+
     horizontal = len(board)
     vertical = len(board[0])
     newBoard = [[0 for z in range(vertical)] for w in range(horizontal)]
 
     for x in range(horizontal):              #loop through rows
         for y in range(vertical):            #loop through columns
-               newBoard[x][y] = board[x][y]
+               newBoard[x][y] = OriginalBoard[x][y]
 
     return newBoard
 

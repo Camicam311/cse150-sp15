@@ -33,6 +33,7 @@ def findEmptySpace(board):
 #Output: True if board is solved
 def is_complete(board):
     curr = 0
+
     for row in board:                     #loop through rows
         for number in row:                #loop through columns
             if(number != curr):
@@ -71,6 +72,7 @@ def BFS(board):
             legal = True
             newMove = move + action
             testBoard = resetBoard(board)   #revert back to the original
+
             findEmptySpace(testBoard)
             newBoard = doMoves(testBoard, newMove)  #do set of moves on original board
             if(inList(newBoard, boardList) == False and legal == True): #if not in boardList and legal moves
@@ -83,19 +85,19 @@ def BFS(board):
 
     print("UNSOLVABLE")
 
-#Reverts the board back to the original (the one from the input parameter)
+#Reverts the board back to the original (the one from the input parameters)
 #Input: An mxn 2d array "board" in which moves have been performed.
-#Output: The original board (the one from the input parameter).
+#Output: The original board
 def resetBoard(board):
-    horizontal = len(board)
-    vertical = len(board[0])
-    newBoard = [[0 for z in range(vertical)] for w in range(horizontal)]
+    global OriginalBoard
+    horizontal = len(OriginalBoard)
+    vertical = len(OriginalBoard[0])
 
-    for x in range(horizontal):              #loop through rows
-        for y in range(vertical):            #loop through columns
-               newBoard[x][y] = board[x][y]
+    for x in range(horizontal):                 #loop through rows
+        for y in range(vertical):               #loop through columns
+               board[x][y] = OriginalBoard[x][y]
 
-    return newBoard
+    return board
 
 #Checks if newBoard is in the boardList (where boardList stores the list of new
 # board configurations found)
@@ -294,9 +296,22 @@ def moveRight(board):
         return True
     return False
 
+#saves copy of the original board to a global variable
+#Input: An mxn 2d array "board" that was created from the input parameter
+#Output: none
+def storeCopy(board):
+    global OriginalBoard
+    horizontal = len(board)
+    vertical = len(board[0])
+
+    for x in range(horizontal):          #loop through rows
+        for y in range(vertical):        #loop through columns
+               OriginalBoard[x][y] = board[x][y]
+
 #MAIN
 def main():
     import sys
+    global OriginalBoard
     #read the input parameters and save the board into a 2d matrix
     board = [[int(n.strip()) for n in line.split(',')] for line in sys.stdin.readlines()]
     if(findEmptySpace(board) == False):
@@ -305,6 +320,12 @@ def main():
 
     if(is_complete(board)): #if already solved
         sys.exit()
+
+    horizontal = len(board)
+    vertical = len(board[0])
+    OriginalBoard = [[0 for z in range(vertical)] for w in range(horizontal)]   #initialize the board
+
+    storeCopy(board)    #make copy of original board
 
     BFS(board)  #Perform Breath First Search on board
 

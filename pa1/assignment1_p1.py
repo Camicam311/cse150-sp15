@@ -13,7 +13,6 @@ def is_complete(board):
     curr = 0
     for row in board:             #loop through rows
         for number in row:        #loop through columns
-            print(number)
             if(number != curr):
                 return False      #the puzzle isn't ordered correctly
             curr = curr + 1

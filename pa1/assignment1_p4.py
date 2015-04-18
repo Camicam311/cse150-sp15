@@ -57,7 +57,7 @@ def is_complete(board):
 #Input: An mxn 2d array "board" that you want to find the solution to
 #Output: "UNSOLVABLE" if IDS doens't find a solution
 def IDS(board):
-    for x in range(2,12): #hard limit is 12
+    for x in range(1,12): #hard limit is 12
         DLS(board, x)
     print("UNSOLVABLE")   #we didn't find a solution in 12 moves or less
 
