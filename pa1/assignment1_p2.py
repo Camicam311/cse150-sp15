@@ -327,6 +327,7 @@ def main():
 
     storeCopy(board)    #make copy of original board
 
+
     BFS(board)  #Perform Breath First Search on board
 
 if __name__ == "__main__":

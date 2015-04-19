@@ -64,13 +64,14 @@ def is_complete(board):
 #Output: A string of moves for the solution if found
 def aStar(board):
     import sys
-    global boardList, q, legal, configs, foundConfigs
+    global boardList, q, legal, configs, foundConfigs,count
 
     horizontal = len(board)
     vertical = len(board[0])
     size = horizontal*vertical
     configs = (factorial(size))/2                   #total number of "solvable" configurations for board
     foundConfigs = 1
+    count = 0
 
     boardList = []
     boardCopy = board
@@ -82,7 +83,7 @@ def aStar(board):
     q = PriorityQueue()                             #priority queue that orders according to least total distance
     enqueueMoves(board)                             #add initial moves to queue
     while(q.empty() != True):
-        move = q.get()[1]
+        move = q.get()[2]
         for action in allMoves:
             legal = True
             newMove = move + action
@@ -97,7 +98,8 @@ def aStar(board):
                         print("UNSOLVABLE")
                         sys.exit()
                     addtoList(newBoard)
-                    q.put((len(newMove) + findSimilarity(newBoard),newMove))    #add word to queue
+                    q.put((len(newMove) + findSimilarity(newBoard),count, newMove))    #add word to queue
+                    count += 1
     print("UNSOLVABLE")
 
 #Heuristic function that determines how close the board is to the "solved" board
@@ -222,14 +224,15 @@ def doMoves(boardCopy,newMove):
 #Output: the queue with the legal initial moves inserted
 def enqueueMoves(board):
     import sys
-    global boardList, foundConfigs, row, column, q
+    global boardList, foundConfigs, row, column, q, count
 
     if(row != 0):                               #if moveUp is a legal move
         moveUp(board)
         if(is_complete(board)):                 #Check if this move solves the board
             print("U")
             sys.exit()
-        q.put((1 + findSimilarity(board),"U"))
+        q.put((1 + findSimilarity(board),count,"U"))
+        count += 1
         addtoList(board)
         moveDown(board)
         foundConfigs = foundConfigs + 1
@@ -239,7 +242,8 @@ def enqueueMoves(board):
         if(is_complete(board)):                 #Check if this move solves the board
             print("D")
             sys.exit()
-        q.put((1 + findSimilarity(board),"D"))
+        q.put((1 + findSimilarity(board),count, "D"))
+        count += 1
         addtoList(board)
         moveUp(board)
         foundConfigs = foundConfigs + 1
@@ -249,7 +253,8 @@ def enqueueMoves(board):
         if(is_complete(board)):                 #Check if this move solves the board
             print("L")
             sys.exit()
-        q.put((1 + findSimilarity(board),"L"))
+        q.put((1 + findSimilarity(board),count, "L"))
+        count += 1
         addtoList(board)
         moveRight(board)
 
@@ -260,7 +265,8 @@ def enqueueMoves(board):
         if(is_complete(board)):                 #Check if this move solves the board
             print("R")
             sys.exit()
-        q.put((1 + findSimilarity(board),"R"))
+        q.put((1 + findSimilarity(board),count,"R"))
+        count += 1
         addtoList(board)
         moveLeft(board)
         foundConfigs = foundConfigs + 1

@@ -80,7 +80,8 @@ def DLS(board):
                     print(newMove)
                     sys.exit()
                 if(legal == True and len(currMove) < maxLimit): #if not over limit and legal moves
-                    stack.insert(0,currMove)
+                    #stack.insert(0,currMove)
+                    stack.append(currMove)
     print("UNSOLVABLE")
 
 #Reverts the board back to the original (the one from the input parameters)
