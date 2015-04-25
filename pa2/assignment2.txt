@@ -76,9 +76,10 @@ Problem 1
 Implement a minimax search algorithm in p1 minimax player.py. The game tree can expand quickly with the
 board size, but you do not need to worry about the efficiency for this problem - this will only be tested with small
 boards.
-When there are moves with the same values, choose the move that comes earlier in “right-left then top-down” order.
-(Note that this should happen automatically if you iterate the actions returned by the action() method.) So, for
-instance, if placing stones at (0, 0) and (0, 1) yields same values, (0, 0) should be returned.
+When there are moves with the same values, choose the move that comes earlier in “right-left then top-down” order,
+with respect to the board. (Note that this should happen automatically if you iterate the actions returned by the
+action() method.) So, for instance, if placing stones at (0, 1) and (1, 0) yield same values, (0, 1) should be
+returned, regardless of the last move.
 
 2
 
@@ -88,7 +89,7 @@ State(3,(
 (0,2,1),
 (0,1,2),
 (0,0,0),
-), last_action=Action(2, (1,1)))
+), last_action=Action(2, (0,1)))
 
 output1.txt
 Action(1, (0, 0))
@@ -104,7 +105,7 @@ State(5,(
 (9,1,9,9,1,9),
 (0,9,9,9,1,9),
 (9,9,9,9,2,9)
-), last_action=Action(2, (7,5)))
+), last_action=Action(2, (6,4)))
 
 output2.txt
 Action(1, (1, 4))
@@ -119,16 +120,16 @@ With these two optimizations, the code should be able to handle slightly larger 
 Examples
 input2.txt
 State(5,(
-(0,0,0,0,0,0),
+(9,9,0,0,0,0),
 (9,9,9,0,0,0),
-(9,9,9,0,0,0),
+(9,9,9,0,0,9),
 (9,9,1,9,1,9),
 (9,1,9,9,1,9),
 (0,9,9,9,1,9),
 3
 
 (9,9,9,9,2,9)
-), last_action=Action(2, (7,5)))
+), last_action=Action(2, (6,4)))
 
 output2.txt
 Action(1, (1, 4))
@@ -146,16 +147,16 @@ stone color), divided by K. Since the longest streak you can achieve is K, the v
 Examples
 (In these examples, the color is assumed to be 1, i.e. the evaluation is for the player 1.)
 input1.txt
-State(3,(
-(0,2,1),
-(0,1,2),
-(0,0,0),
-), last_action=Action(2, (1,1)))
+State(4,(
+(0,2,1,0),
+(0,1,2,0),
+(0,0,0,0),
+(0,0,0,0)
+), last_action=Action(2, (0,1)))
 
 output1.txt
-0.6666666666666666
-
-The longest streak is 2, so the evaluate() method should return 2.0/3.0.
+0.5
+The longest streak is 2, so the evaluate() method should return 2.0/4.0.
 input2.txt
 State(5,(
 (0,0,0,0,0,0),
@@ -165,7 +166,7 @@ State(5,(
 (0,1,0,0,1,0),
 (0,0,0,0,1,0),
 (0,0,0,0,2,0)
-), last_action=Action(2, (7,5)))
+), last_action=Action(2, (6,4)))
 
 output2.txt
 0.8
@@ -173,12 +174,13 @@ output2.txt
 4
 
 Problem 4
-Implement a custom agent that plays a game of Connect6 on an 19 × 19 board (M, N = 19, K = 6) in the
-p4 custom player.py file. Rename the class and override the name() method to your liking. After the homework submission deadline, we’ll also have a tournament among all submitted agents with different per-move time
-limits. There’ll be prizes for the winning agents and extra credits for especially clever / innovative agents!
+Implement a custom agent that can play any m, n, k-game, up to K = 6 on 19 × 19 board (M, N = 19, K = 6)
+in the p4 custom player.py file. Rename the class and override the name() method to your liking. After the
+homework submission deadline, we’ll also have a tournament among all submitted agents with different per-move
+time limits. There’ll be prizes for the winning agents and extra credits for especially clever / innovative agents!
 A good start will be to implement an iterative deepening minimax search with alpha-beta pruning, transposition table
-and move-ordering based on the evaluation function of Problem 3. Opening heuristics may also be effective. However,
-you’re free to improve on these.
+and move-ordering based on the evaluation function of Problem 3. Opening heuristics may also be needed, especially
+when the board is so large. However, you’re free to improve on these.
 The code should be written so that it can search to arbitrary depths depending on the board size and allowed time. To
 do this, follow these guidelines:
 1. Check for the self.is time up() condition often in your main computation loop (searching through the
@@ -195,16 +197,18 @@ $ python run_game.py 19 19 6 10 HumanPlayer YourCustomPlayer
 
 Problem 5
 Submit a write-up for this project in PDF. You should include the following:
+• Description of the problem and the algorithms used to solve problems 2 - 4.
 • Describe the approach you used in Problem 4 and other approaches you tried / considered, if any. Which
 techniques were the most effective?
 • Evaluate qualitatively how your custom agent plays. Did you notice any situations where they make seemingly
 irrational decisions? What could you do/what did you do to improve the performance in these situations?
-• Explain what you did to test your agents. Show some results of your testing.
-• What is the maximum board size your minimax agent can play in a reasonable amount of time? How much
-bigger board can your alpha-beta agent search in the same amount of time?
-• Create multiple copies of your custom agents with different depth limits. (You can simply copy the p4 custom player.py
-file to other * player.py and change the class names inside.) Make them play against each other at least 10
-games with the same time limits. Report the number of wins, losses and ties in a table. Discuss your finding.
+• What is the maximum number of empty squares on the board for which the minimax agent can play in a
+reasonable amount of time? What about the alpha-beta agent and your custom agent, in the same amount of
+time?
+• Create multiple copies of your custom agents with different depth limits. (You can do this by copying the
+p4 custom player.py file to other * player.py and changing the class names inside.) Make them play
+against each other in at least 10 games on a game with K > 3. Report the number of wins, losses and ties in a
+table. Discuss your finding.
 • A paragraph from each author stating what their contribution was and what they learned.
 Your writeup should be structured as a formal report, and we will grade based on the quality of the writeup, including
 structure and clarity of explanations.
