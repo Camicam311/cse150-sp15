@@ -20,6 +20,12 @@ class MinimaxPlayer(Player):
         # I think this shit is busted. It returns moves, but I managed to
         # beat it, which isn't a good sign. We need to investigate further.
         # @itsweller is the one that fuckered this all up
+
+        # TODO: Check how min sorts and orders. We could be selecting the 
+        # "wrong" move even though it may be correct for breaking ties
+        # if min doesn't perserve ordering. This can be fixed with a for
+        # loop, but that's not as sexy as 1 line list comprehensions and 
+        # lambdas
         '''
         Args:
             state (State): The current state of the board.
