@@ -26,26 +26,23 @@ class MinimaxPlayer(Player):
         # if min doesn't perserve ordering. This can be fixed with a for
         # loop, but that's not as sexy as 1 line list comprehensions and 
         # lambdas
+
         '''
         Args:
             state (State): The current state of the board.
-            min_or_max (String): Whether we're to perform min or max stage,
-                                 accepted values are 'min' and 'max'
         '''
-        def minimax_play(state, min_or_max):
+        def minimax_play(state):
             if state.is_terminal():
                 return state.utility(self)
-            if min_or_max == 'min':
-                return min([(minimax_play(state.result(possibility),'max'), 
+            if state.to_play == self: # Maximize for us
+                return max([(minimax_play(state.result(possibility)), 
                     possibility) for possibility in state.actions()], 
                     key=lambda x:x[0])
-            if min_or_max == 'max':
-                return max([(minimax_play(state.result(possibility),'min'), 
+            else:                     # Minimize for them 
+                return min([(minimax_play(state.result(possibility)), 
                     possibility) for possibility in state.actions()], 
                     key=lambda x:x[0])
 
-        return max([(minimax_play(state.result(possibility),'min'), 
-            possibility) for possibility in state.actions()],
-            key=lambda x:x[0])[1]
+        return  minimax_play(state)[1]
 
 
