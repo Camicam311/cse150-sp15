@@ -44,6 +44,8 @@ class MinimaxPlayer(Player):
                     possibility) for possibility in state.actions()], 
                     key=lambda x:x[0])
 
-        return max([(minimax_play(state.result(possibility),'min'), possibility) for possibility in state.actions()],key=lambda x:x[0])[1]
+        return max([(minimax_play(state.result(possibility),'min'), 
+            possibility) for possibility in state.actions()],
+            key=lambda x:x[0])[1]
 
 
