@@ -34,34 +34,23 @@ class MinimaxPlayer(Player):
         global move
         move = None
         def minimax_play(state):
-            global move
-            if state.is_terminal():
-                return state.utility(self)
-
-            ls = []
-            if state.to_play == self: # Maximize for us
-                for possibility in state.actions():
-                    ls.append((possibility,minimax_play(state.result(possibility))))
-                current_largest = None,-2
-                for x in ls:
-                    if x[1] > current_largest[1]:
-                        current_largest = x[0],x[1]
-                        move = current_largest[0]
-                print current_largest[1]
-                return current_largest[1]
-
-            else:                     # Minimize for them 
-                for possibility in state.actions():
-                    ls.append((possibility,minimax_play(state.result(possibility))))
-                current_largest = None,2
-                for x in ls:
-                    if x[1] < current_largest[1]:
-                        current_largest = x[0],x[1]
-                        move = current_largest[0]
-                print current_largest[1]
-                return current_largest[1]
-
+           global move
+           pair = None
+           if state.is_terminal():
+               return state.utility(self)
+           if state.to_play == self: # Maximize for us
+               pair = max([(minimax_play(state.result(possibility)), 
+                   possibility) for possibility in state.actions()], 
+                   key=lambda x:x[0])
+           else:                     # Minimize for them 
+               pair = min([(minimax_play(state.result(possibility)), 
+                   possibility) for possibility in state.actions()], 
+                   key=lambda x:x[0])
+           move = pair[1]
+           return pair[0]
         minimax_play(state)
         return move
+              
+
 
 
