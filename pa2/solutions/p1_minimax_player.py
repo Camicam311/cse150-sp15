@@ -17,33 +17,40 @@ class MinimaxPlayer(Player):
         # internal function because otherwise python throws a hissy fit
         # (geddit, hissy, python, that's a pun)
 
-        # TODO: Check how min sorts and orders. We could be selecting the 
-        # "wrong" move even though it may be correct for breaking ties
-        # if min doesn't perserve ordering. This can be fixed with a for
-        # loop, but that's not as sexy as 1 line list comprehensions and 
-        # lambdas
-
         '''
         Args:
             state (State): The current state of the board.
         '''
         global move
         move = None
+
         def minimax_play(state):
-           global move
-           pair = None
-           if state.is_terminal():
-               return state.utility(self)
-           if state.to_play == self: # Maximize for us
-               pair = max([(minimax_play(state.result(possibility)), 
-                   possibility) for possibility in state.actions()], 
-                   key=lambda x:x[0])
-           else:                     # Minimize for them 
-               pair = min([(minimax_play(state.result(possibility)), 
-                   possibility) for possibility in state.actions()], 
-                   key=lambda x:x[0])
-           move = pair[1]
-           return pair[0]
+            global move
+            current_best = None
+
+            if state.is_terminal():
+                return state.utility(self)
+
+            if state.to_play == self: # Maximize for us
+                current_best = -2
+                for (score, poss) in [(minimax_play(state.result(possibility)), 
+                    possibility) for possibility in state.actions()]:
+ 
+                    if score > current_best:
+                        current_best = score
+                        move = poss
+
+            else:                     # Minimize for them 
+                current_best = 2
+                for (score, poss) in [(minimax_play(state.result(possibility)), 
+                    possibility) for possibility in state.actions()]:
+ 
+                    if score < current_best:
+                        current_best = score
+                        move = poss
+
+            return current_best
+        
         minimax_play(state)
         return move
               
