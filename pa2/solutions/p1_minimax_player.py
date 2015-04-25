@@ -15,7 +15,7 @@ class MinimaxPlayer(Player):
         """
 
         # internal function because otherwise python throws a hissy fit
-        # (geddit, hissy fit, that's a pun)
+        # (geddit, hissy, python, that's a pun)
 
         # I think this shit is busted. It returns moves, but I managed to
         # beat it, which isn't a good sign. We need to investigate further.
