@@ -11,6 +11,10 @@ class Seabiscout(Player):
         return 'Seabiscout'
 
     global move
+    global bestStates
+    global newBestStates
+    global solvedBoard
+    solvedBoard = False
     move = None
 
     def move(self, state):
@@ -85,6 +89,8 @@ class Seabiscout(Player):
             current_best = None
 
             if state.is_terminal() or depth >= limit:
+                if(state.is_terminal()):
+                    solvedBoard = True
                 return evaluate(state, 1)
 
             #if (tTable[state] == None):
@@ -107,6 +113,7 @@ class Seabiscout(Player):
                     if score > current_best:
                         current_best = score
                         move, my_move = poss
+                        bestStates.append(state)
 
             else:                     # Minimize for them
                 current_best = 2
@@ -121,14 +128,71 @@ class Seabiscout(Player):
                     if score < current_best:
                         current_best = score
                         move, my_move = poss
+                        bestStates.append(state)
+
+
+            return current_best
+
+        def bestIterativeMinimax_play(state, alpha, beta, limit,depth):
+            global move
+            current_best = None
+
+            if state.is_terminal() or depth >= limit:
+                if(state.is_terminal()):
+                    solvedBoard = True
+                return evaluate(state, 1)
+
+            #if (tTable[state] == None):
+                #tTable[state] = prevScore
+
+            #if state.is_terminal():
+                #return state.utility(self)
+
+            if state.to_play == self: # Maximize for us
+                current_best = -2
+                depth = depth + 1
+                for (score, poss) in [(minimax_play(the_best_state.result(possibility), alpha, beta, limit, depth),
+                    possibility) for (possibility, the_best_state) in (the_best_state.actions(), bestStates)]:
+
+                    if score >= beta:
+                        return score
+
+                    alpha = max(score, alpha)
+
+                    if score > current_best:
+                        current_best = score
+                        move, my_move = poss
+                        newBestStates.append(state)
+
+            else:                     # Minimize for them
+                current_best = 2
+                depth = depth + 1
+                for (score, poss) in [(minimax_play(the_best_state.result(possibility), alpha, beta, limit, depth),
+                    possibility) for (possibility, the_best_state) in (the_best_state.actions(), bestStates)]:
+                    if score <= alpha:
+                        return score
+
+                    beta = min(score, beta)
+
+                    if score < current_best:
+                        current_best = score
+                        move, my_move = poss
+                        newBestStates.append(state)
 
 
             return current_best
 
         limit = 1
-        while not self.is_time_up() and self.feel_like_thinking():
-            iterativeMinimax_play(state,float("-inf"), float("inf"), limit, 0)
+        bestStates = []
+        newBestStates = []
+        while (not self.is_time_up() and self.feel_like_thinking()) or not solvedBoard:
+            if not bestStates:
+                iterativeMinimax_play(state,float("-inf"), float("inf"), limit, 0)
+            else:
+                bestIterativeMinimax_play(state,float("-inf"), float("inf"), limit, limit)
             limit += 1
+            bestStates = newBestStates
+            newBestStates = []
 
         return my_move
 
