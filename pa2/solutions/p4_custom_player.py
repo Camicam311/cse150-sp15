@@ -5,31 +5,133 @@ __email__ = 'rchandra@uci.edu,wcurnow@uci.edu'
 from assignment2 import Player, State, Action
 
 
-class YourCustomPlayer(Player):
+class Seabiscout(Player):
     @property
     def name(self):
-        """Returns the name of this agent. Try to make it unique!"""
-        return 'HAL9000'
+        return 'Seabiscout'
+
+    global move
+    move = None
 
     def move(self, state):
-        """Calculates the absolute best move from the given board position using magic.
-        
-        Args:
-            state (State): The current state of the board.
+        move = None
+        tTable = defaultdict(lambda: None)         #Transposition table
 
-        Returns:
-            your next Action instance
-        """
         my_move = state.actions()[0]
 
-        while not self.is_time_up() and self.feel_like_thinking():
-            # Do some thinking here
-            my_move = self.do_the_magic(state)
+        def evaluate(self, state, color):
+            # Row search
+            max_row_sum = -1.0
+            max_col_sum = -1.0
+            diag_max_sum_dr = 0.0
+            diag_max_sum_ul = 0.0
 
-        # Time's up, return your move
-        # You should only do a small amount of work here, less than one second.
-        # Otherwise a random move will be played!
+            for row in state.board:
+                max_row_sum = max(sum([1 for pos in row if pos==color]),max_row_sum)
+
+            # Column search
+            for j in range(len(state.board[0])):
+                col_list = []
+                for i in range(len(state.board)):
+                    if state.board[i][j] == color:
+                        col_list.append(1)
+                max_col_sum = max(sum(col_list),max_col_sum)
+
+            # Diag search
+            diag_count = len(state.board[0]) + len(state.board) - 1
+            diag_x_s, diag_y_s = (0,0)
+            x,y = (diag_x_s,diag_y_s)
+            # up left
+            for z in range(diag_count):
+                cur_total = 0
+                while(x >= 0 and y <= len(state.board[0]) - 1):
+                    if state.board[x][y] == color:
+                        cur_total += 1
+                    x -= 1
+                    y += 1
+
+                if diag_x_s < len(state.board) - 1:
+                    diag_x_s += 1
+                else:
+                    diag_y_s += 1
+
+                x,y = (diag_x_s,diag_y_s)
+                diag_max_sum_ul = max(diag_max_sum_ul, cur_total)
+
+            # down right
+            diag_x_s, diag_y_s = (len(state.board[0])-1,0)
+            x,y = (diag_x_s,diag_y_s)
+            for z in range(diag_count):
+                cur_total = 0
+                while(x <= len(state.board[0])-1 and y <= len(state.board) - 1):
+                    if state.board[y][x] == color:
+                        cur_total += 1
+                    x += 1
+                    y += 1
+
+                if diag_x_s > 0:
+                    diag_x_s -= 1
+                else:
+                    diag_y_s += 1
+
+                x,y = (diag_x_s,diag_y_s)
+                diag_max_sum_dr = max(diag_max_sum_dr, cur_total)
+
+            return (max(diag_max_sum_dr, diag_max_sum_ul, max_col_sum, max_row_sum))/state.K
+
+
+        def iterativeMinimax_play(state, alpha, beta, limit,depth):
+            global move
+            current_best = None
+
+            if state.is_terminal() or depth >= limit:
+                return evaluate(state, 1)
+
+            #if (tTable[state] == None):
+                #tTable[state] = prevScore
+
+            #if state.is_terminal():
+                #return state.utility(self)
+
+            if state.to_play == self: # Maximize for us
+                current_best = -2
+                depth = depth + 1
+                for (score, poss, depth) in [(minimax_play(state.result(possibility), alpha, beta, limit, depth),
+                    possibility) for possibility in state.actions()]:
+
+                    if score >= beta:
+                        return score
+
+                    alpha = max(score, alpha)
+
+                    if score > current_best:
+                        current_best = score
+                        move, my_move = poss
+
+            else:                     # Minimize for them
+                current_best = 2
+                depth = depth + 1
+                for (score, poss) in [(minimax_play(state.result(possibility), alpha, beta, limit,depth),
+                    possibility) for possibility in state.actions()]:
+                    if score <= alpha:
+                        return score
+
+                    beta = min(score, beta)
+
+                    if score < current_best:
+                        current_best = score
+                        move, my_move = poss
+
+
+            return current_best
+
+        limit = 1
+        while not self.is_time_up() and self.feel_like_thinking():
+            iterativeMinimax_play(state,float("-inf"), float("inf"), limit, 0)
+            limit += 1
+
         return my_move
+
 
     def feel_like_thinking(self):
         # You can code here how long you want to think perhaps.
@@ -38,4 +140,3 @@ class YourCustomPlayer(Player):
     def do_the_magic(self, state):
         # Do the magic, return the first available move!
         return state.actions()[0]
-

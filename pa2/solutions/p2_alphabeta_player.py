@@ -4,6 +4,7 @@ __email__ = 'rchandra@uci.edu,wcurnow@uci.edu'
 
 from assignment2 import Player, State, Action
 from collections import defaultdict
+
 class AlphaBetaPlayer(Player):
     def move(self, state):
         """Calculates the best move from the given board using the minimax algorithm.
@@ -24,52 +25,59 @@ class AlphaBetaPlayer(Player):
         '''
         global move
         move = None
+        prevScore = 0
 
-        tTable = defaultdict(lambda: False)         #Transposition table
+        tTable = defaultdict(lambda: None)         #Transposition table
 
-        def minimax_play(state, alpha, beta):
+        def minimax_play(state, alpha, beta, prevScore):
             global move
             current_best = None
 
             if state.is_terminal():
                 return state.utility(self)
 
-            if state.to_play == self: # Maximize for us
-                current_best = -2
-                for (score, poss) in [(minimax_play(state.result(possibility), alpha, beta),
-                    possibility) for possibility in state.actions()]:
-                    #if tTable[state.result(possibility)]:
-                     #   continue
-                    #else: tTable[state.result(possibility)] = True
+            if (tTable[state] == None):
+                tTable[state] = prevScore
+
+            #if state.is_terminal():
+                #return state.utility(self)
+
+                if state.to_play == self: # Maximize for us
+                    current_best = -2
+
+                    for (score, poss) in [(minimax_play(state.result(possibility), alpha, beta, current_best),
+                        possibility) for possibility in state.actions()]:
+
+                        if score >= beta:
+                            return score
+
+                        alpha = max(score, alpha)
+
+                        if score > current_best:
+                            current_best = score
+                            move = poss
+
+                else:                     # Minimize for them
+                    current_best = 2
+                    for (score, poss) in [(minimax_play(state.result(possibility), alpha, beta, current_best),
+                        possibility) for possibility in state.actions()]:
+
+                        if score <= alpha:
+                            return score
+
+                        beta = min(score, beta)
+
+                        if score < current_best:
+                            current_best = score
+                            move = poss
+
+                return current_best
 
 
-                    if score >= beta:
-                        return score
+            else:
+                tTable[state] = prevScore
+                return tTable[state]
 
-                    alpha = max(score, alpha)
-
-                    if score > current_best:
-                        current_best = score
-                        move = poss
-
-            else:                     # Minimize for them 
-                current_best = 2
-                for (score, poss) in [(minimax_play(state.result(possibility), alpha, beta),
-                    possibility) for possibility in state.actions()]:
-                    #if tTable[state.result(possibility)]:
-                     #   continue
-                    #else: tTable[state.result(possibility)] = True
-
-                    if score <= alpha:
-                        return score
-
-                    beta = min(score, beta)
- 
-                    if score < current_best:
-                        current_best = score
-                        move = poss
-
-            return current_best
-        
-        minimax_play(state,float("-inf"), float("inf"))
+        #tTable[state] = True
+        minimax_play(state,float("-inf"), float("inf"), 0)
         return move
