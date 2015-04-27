@@ -7,7 +7,8 @@ from collections import defaultdict
 
 class AlphaBetaPlayer(Player):
     def move(self, state):
-        """Calculates the best move from the given board using the minimax algorithm.
+        """Calculates the best move from the given board using the minimax 
+           algorithm.
 
         Args:
             state (State): The current state of the board.
@@ -45,8 +46,9 @@ class AlphaBetaPlayer(Player):
                 if state.to_play == self: # Maximize for us
                     current_best = -2
 
-                    for (score, poss) in [(minimax_play(state.result(possibility), alpha, beta, current_best),
-                        possibility) for possibility in state.actions()]:
+                    for (score,poss) in [(minimax_play(state.result(possibility),
+                        alpha, beta, current_best), possibility) 
+                        for possibility in state.actions()]:
 
                         if score >= beta:
                             return score
@@ -59,8 +61,9 @@ class AlphaBetaPlayer(Player):
 
                 else:                     # Minimize for them
                     current_best = 2
-                    for (score, poss) in [(minimax_play(state.result(possibility), alpha, beta, current_best),
-                        possibility) for possibility in state.actions()]:
+                    for (score,poss) in [(minimax_play(state.result(possibility),
+                        alpha, beta, current_best), possibility) 
+                        for possibility in state.actions()]:
 
                         if score <= alpha:
                             return score
