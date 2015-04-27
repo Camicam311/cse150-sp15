@@ -107,4 +107,5 @@ class EvaluationPlayer(Player):
             x,y = (diag_x_s,diag_y_s)
             diag_max_sum_dr = max(diag_max_sum_dr, cur_total)
 
-        return (max(diag_max_sum_dr, diag_max_sum_ul, max_col_sum, max_row_sum))/state.K
+        return (float(max(diag_max_sum_dr, diag_max_sum_ul, max_col_sum, 
+            max_row_sum))/state.K)
