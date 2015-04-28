@@ -30,25 +30,30 @@ class AlphaBetaPlayer(Player):
 
         tTable = defaultdict(lambda: None)         #Transposition table
 
-        def minimax_play(state, alpha, beta, prevScore):
+        def minimax_play(state, alpha, beta):
             global move
+            global lastScore
             current_best = None
 
-            if state.is_terminal():
-                return state.utility(self)
-
-            if (tTable[state] == None):
-                tTable[state] = prevScore
-
             #if state.is_terminal():
-                #return state.utility(self)
+            #    return state.utility(self)
+
+            if (tTable.get(state) == None):
+                #tTable[state] = True
+
+                if state.is_terminal():
+                    return state.utility(self)
 
                 if state.to_play == self: # Maximize for us
                     current_best = -2
 
                     for (score,poss) in [(minimax_play(state.result(possibility),
-                        alpha, beta, current_best), possibility) 
-                        for possibility in state.actions()]:
+                        alpha, beta), possibility) for possibility 
+                        in state.actions()]:
+
+                        #lastScore = score
+                        if(tTable[state] < score):
+                            tTable[state] = score
 
                         if score >= beta:
                             return score
@@ -61,9 +66,13 @@ class AlphaBetaPlayer(Player):
 
                 else:                     # Minimize for them
                     current_best = 2
+                    
                     for (score,poss) in [(minimax_play(state.result(possibility),
-                        alpha, beta, current_best), possibility) 
-                        for possibility in state.actions()]:
+                        alpha, beta), possibility) for possibility 
+                        in state.actions()]:
+
+                        if(tTable[state] > score):
+                            tTable[state] = score
 
                         if score <= alpha:
                             return score
@@ -78,9 +87,8 @@ class AlphaBetaPlayer(Player):
 
 
             else:
-                tTable[state] = prevScore
                 return tTable[state]
 
         #tTable[state] = True
-        minimax_play(state,float("-inf"), float("inf"), 0)
+        minimax_play(state,float("-inf"), float("inf"))
         return move
