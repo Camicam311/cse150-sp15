@@ -3,22 +3,23 @@ __author__ = 'Sivasubramanian Chandrasegarampillai, Walter Curnow'
 __email__ = 'rchandra@uci.edu,wcurnow@uci.edu'
 
 from assignment2 import Player, State, Action
-
+from collections import defaultdict
 
 class Seabiscout(Player):
     @property
     def name(self):
         return 'Seabiscout'
 
-    global move
+    global _move
     global bestStates
     global newBestStates
-    global solvedBoard
+    global solvedGame
     solvedGame = False
-    move = None
+    #move = None
 
     def move(self, state):
-        move = None
+        global _move
+        _move = None
         tTable = defaultdict(lambda: None)         #Transposition table
 
         my_move = state.actions()[0]
@@ -85,26 +86,27 @@ class Seabiscout(Player):
 
 
         def iterativeMinimax_play(state, alpha, beta, limit,depth):
-            global move
+            global _move
             current_best = None
 
             if state.is_terminal() or depth >= limit:
                 if(state.is_terminal()):
                     solvedGame = True
-                return evaluate(state, 1)
+                if(state.to_play == self):
+                    return evaluate(self, state, state.to_play)
 
             if (tTable.get(state) == None):
 
                 if state.is_terminal() or depth >= limit:
                     if(state.is_terminal()):
                         solvedGame = True
-                    return evaluate(state, 1)
+                    return evaluate(self,state, state.to_play)
 
 
                 if state.to_play == self: # Maximize for us
                     current_best = -2
                     depth = depth + 1
-                    for (score, poss, depth) in [(minimax_play(state.result(possibility), alpha, beta, limit, depth),
+                    for (score, poss, depth) in [(iterativeMinimax_play(state.result(possibility), alpha, beta, limit, depth),
                         possibility) for possibility in state.actions()]:
 
                         if(tTable[state] > score):
@@ -117,13 +119,13 @@ class Seabiscout(Player):
 
                         if score > current_best:
                             current_best = score
-                            move, my_move = poss
+                            _move = poss
                             bestStates.append(state)
 
                 else:                     # Minimize for them
                     current_best = 2
                     depth = depth + 1
-                    for (score, poss) in [(minimax_play(state.result(possibility), alpha, beta, limit,depth),
+                    for (score, poss) in [(iterativeMinimax_play(state.result(possibility), alpha, beta, limit,depth),
                         possibility) for possibility in state.actions()]:
 
                         if(tTable[state] > score):
@@ -136,7 +138,7 @@ class Seabiscout(Player):
 
                         if score < current_best:
                             current_best = score
-                            move, my_move = poss
+                            _move = poss
                             bestStates.append(state)
 
 
@@ -154,13 +156,13 @@ class Seabiscout(Player):
                 if state.is_terminal() or depth >= limit:
                     if(state.is_terminal()):
                         solvedGame = True
-                    return evaluate(state, 1)
+                    return evaluate(self,state, state.to_play)
 
 
                 if state.to_play == self: # Maximize for us
                     current_best = -2
                     depth = depth + 1
-                    for (score, poss) in [(minimax_play(the_best_state.result(possibility), alpha, beta, limit, depth),
+                    for (score, poss) in [(bestIterativeMinimax_play(the_best_state.result(possibility), alpha, beta, limit, depth),
                         possibility) for (possibility, the_best_state) in (the_best_state.actions(), bestStates)]:
 
                         if(tTable[state] < score):
@@ -173,13 +175,13 @@ class Seabiscout(Player):
 
                         if score > current_best:
                             current_best = score
-                            move, my_move = poss
+                            _move = poss
                             newBestStates.append(state)
 
                 else:                     # Minimize for them
                     current_best = 2
                     depth = depth + 1
-                    for (score, poss) in [(minimax_play(the_best_state.result(possibility), alpha, beta, limit, depth),
+                    for (score, poss) in [(bestIterativeMinimax_play(the_best_state.result(possibility), alpha, beta, limit, depth),
                         possibility) for (possibility, the_best_state) in (the_best_state.actions(), bestStates)]:
 
                         if(tTable[state] > score):
@@ -192,7 +194,7 @@ class Seabiscout(Player):
 
                         if score < current_best:
                             current_best = score
-                            move, my_move = poss
+                            _move = poss
                             newBestStates.append(state)
 
 
@@ -204,11 +206,13 @@ class Seabiscout(Player):
         limit = 1
         bestStates = []
         newBestStates = []
-        while (not self.is_time_up() and self.feel_like_thinking()) or not solvedBoard:
+        while (not self.is_time_up() and self.feel_like_thinking()) or not solvedGame:
             if not bestStates:
                 iterativeMinimax_play(state,float("-inf"), float("inf"), limit, 0)
             else:
                 bestIterativeMinimax_play(state,float("-inf"), float("inf"), limit, limit)
+            my_move = _move
+            move = None
             limit += 1
             bestStates = newBestStates
             newBestStates = []
