@@ -22,7 +22,8 @@ def run_code_from(python_file, input_text):
     sys.path.append(os.path.abspath(os.path.dirname(python_file)))
     module = __import__(os.path.splitext(os.path.basename(python_file))[0])
     player_class = next(getattr(module, name) for name in dir(module) if
-                        inspect.isclass(getattr(module, name)) and issubclass(getattr(module, name), Player))
+                        inspect.isclass(getattr(module, name)) and issubclass(getattr(module, name), Player) and \
+                        getattr(module, name) != Player)
     players = Player.create_players([player_class, Player])  # Second player is a dummy
     state = eval(input_text)
     state.to_play = players[0]
