@@ -56,7 +56,7 @@ class Player(object):
         Returns:
             the next move (Action)
         """
-        raise NotImplemented
+        raise NotImplementedError('Please implement the move() method')
 
 
 class Action(object):

@@ -4,9 +4,10 @@
 __author__ = 'Tomoki Tsuchida'
 __email__ = 'ttsuchida@ucsd.edu'
 
-import sys, os
+import os
 from types import MethodType
 from multiprocessing import Process, Queue
+
 try:
     from queue import Empty
 except ImportError:
@@ -27,6 +28,7 @@ class Game(object):
             next_move = self.request_move()
             self.state = self.state.result(next_move)
             self.after_move()
+        return self.state.winner_color
 
     def request_move(self):
         # state = copy.deepcopy(self.state)
@@ -108,15 +110,21 @@ class ConsoleGame(Game):
         print(self.state.last_action)
 
     def play(self):
-        super(ConsoleGame, self).play()
+        winner_color = super(ConsoleGame, self).play()
 
         print(self.state)
 
-        if self.state.winner_color == 0:
+        if winner_color == 0:
             print("Draw!")
+            return None
         else:
-            winner = next((player for player in self.players if player.color == self.state.winner_color))
+            winner = next((player for player in self.players if player.color == winner_color))
             print("%s won!" % str(winner))
+            return winner
+
+
+def player_classes():
+    """Returns all player classes that can be found."""
 
 
 if __name__ == '__main__':
@@ -146,7 +154,8 @@ if __name__ == '__main__':
 
     modules = [__import__(op.splitext(op.basename(f))[0]) for f in player_files]
     names = dict([(name, module) for module in modules for name in dir(module) if
-                  inspect.isclass(getattr(module, name)) and issubclass(getattr(module, name), Player)])
+                  inspect.isclass(getattr(module, name)) and issubclass(getattr(module, name), Player) and \
+                  getattr(module, name) != Player])
     player_classes = [getattr(names[name], name) for name in player_names]
 
     game = ConsoleGame(M, N, K, player_classes, timeout)
