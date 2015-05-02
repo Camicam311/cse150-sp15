@@ -6,10 +6,10 @@ from assignment2 import Player, State, Action
 from collections import defaultdict
 from pprint import pprint
 
-def make_move(self, state):
-    return AlphaBeta(self, state)
+def make_move(self, state, limit):
+    return AlphaBeta(self, state, limit)
 
-def AlphaBeta(self, state):
+def AlphaBeta(self, state, limit):
     """Calculates the best move from the given board using the minimax 
        algorithm.
 
@@ -33,7 +33,7 @@ def AlphaBeta(self, state):
 
     tTable = defaultdict(lambda: None)         #Transposition table
 
-    def minimax_play(state, alpha, beta):
+    def minimax_play(state, alpha, beta,limit,depth):
         global move
         global lastScore
         current_best = None
@@ -44,7 +44,7 @@ def AlphaBeta(self, state):
         if (tTable.get(state) == None):
             #tTable[state] = True
 
-            if state.is_terminal():
+            if state.is_terminal() or depth >= limit:
                 #return state.utility(self)
                 #for x in state.board:
                 #    print x
@@ -70,8 +70,9 @@ def AlphaBeta(self, state):
             if state.to_play == self: # Maximize for us
                 current_best = -2
 
+                depth += 1
                 for (score,poss) in [(minimax_play(state.result(possibility),
-                    alpha, beta), possibility) for possibility 
+                    alpha, beta, limit, depth), possibility) for possibility
                     in state.actions()]:
 
                     #lastScore = score
@@ -89,9 +90,9 @@ def AlphaBeta(self, state):
 
             else:                     # Minimize for them
                 current_best = 2
-                
+                depth += 1
                 for (score,poss) in [(minimax_play(state.result(possibility),
-                    alpha, beta), possibility) for possibility 
+                    alpha, beta, limit, depth), possibility) for possibility
                     in state.actions()]:
 
                     if(tTable[state] > score):
@@ -113,7 +114,7 @@ def AlphaBeta(self, state):
             return tTable[state]
 
     #tTable[state] = True
-    minimax_play(state,-2,2)
+    minimax_play(state,-2,2, limit, 0)
     return move
 
 def evaluate(self, state, color):
@@ -210,9 +211,11 @@ class Seabiscuit(Player):
         """
         my_move = state.actions()[0]
 
+        limit = 1
         while not (self.is_time_up() and self.feel_like_thinking()):
             # Do some thinking here
-            my_move = self.do_the_magic(state)
+            my_move = self.do_the_magic(state,limit)
+            limit += 1
 
         # Time's up, return your move
         # You should only do a small amount of work here, less than one second.
@@ -223,6 +226,7 @@ class Seabiscuit(Player):
         # You can code here how long you want to think perhaps.
         return True
 
-    def do_the_magic(self, state):
-        return make_move(self,state)
+    def do_the_magic(self, state, limit):
+
+        return make_move(self,state,limit)
 
