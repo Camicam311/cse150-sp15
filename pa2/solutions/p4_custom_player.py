@@ -38,33 +38,14 @@ def AlphaBeta(self, state, limit):
         global lastScore
         current_best = None
 
-        #if state.is_terminal():
-        #    return state.utility(self)
-
         if (tTable.get(state) == None):
-            #tTable[state] = True
 
             if state.is_terminal() or depth >= limit:
-                #return state.utility(self)
-                #for x in state.board:
-                #    print x
-                #print state.last_action
-                #print state.to_play
-                
                 other  = 2 if state.to_play.color == 1 else 1
+
                 # if other > to_play ret positive
                 # else ret neg
                 them = evaluate(self, state, other)
-                you = evaluate(self, state, state.to_play.color)
-                #print "Them: ", them, " you: ",you
-                #print "To play: ",state.to_play
-
-                #if them > you:
-                #    res =  them * -1
-                #else:
-                #    res = them
-                #print "h(n): ", you * -1 if state.to_play == self else you, "util: ", state.utility(self)
-                #print "#########"
                 return them * -1 if state.to_play == self else them
 
             if state.to_play == self: # Maximize for us
@@ -75,7 +56,6 @@ def AlphaBeta(self, state, limit):
                     alpha, beta, limit, depth), possibility) for possibility
                     in state.actions()]:
 
-                    #lastScore = score
                     if(tTable[state] < score):
                         tTable[state] = score
 
@@ -113,7 +93,6 @@ def AlphaBeta(self, state, limit):
         else:
             return tTable[state]
 
-    #tTable[state] = True
     minimax_play(state,-2,2, limit, 0)
     return move
 
