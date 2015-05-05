@@ -131,6 +131,7 @@ def evaluate(self, state, color):
     Returns:
         the evaluation value (float), from 1.0 / state.K (worst) to 1.0 (win).
     """
+
     # Row search
     max_row_sum = -1.0
     max_col_sum = -1.0
@@ -138,15 +139,29 @@ def evaluate(self, state, color):
     diag_max_sum_ul = 0.0
 
     for row in state.board:
-        max_row_sum = max(sum([1 for pos in row if pos==color]),max_row_sum)
-  
+        cur_sum = 0
+        cur_max = 0
+        for it in row:
+            if it == color:
+                cur_sum += 1
+            else:
+                cur_max = max(cur_sum,cur_max)
+                cur_sum = 0
+
+        max_row_sum = max(max_row_sum, cur_max, cur_sum)
+
     # Column search
     for j in range(len(state.board[0])):
-        col_list = []
+        cur_sum = 0
+        cur_max = 0
         for i in range(len(state.board)):
             if state.board[i][j] == color:
-                col_list.append(1)
-        max_col_sum = max(sum(col_list),max_col_sum)
+                cur_sum += 1
+            else:
+                cur_max = max(cur_sum,cur_max)
+                cur_sum = 0
+                
+        max_col_sum = max(max_col_sum, cur_max, cur_sum)
 
     # Diag search
     diag_count = len(state.board[0]) + len(state.board) - 1
@@ -154,10 +169,16 @@ def evaluate(self, state, color):
     x,y = (diag_x_s,diag_y_s)
     # up left
     for z in range(diag_count):
-        cur_total = 0
+        cur_max = 0
+        cur_sum = 0
+
         while(x >= 0 and y <= len(state.board[0]) - 1):
             if state.board[x][y] == color:
-                cur_total += 1
+                cur_sum += 1
+            else: 
+                cur_max = max(cur_max, cur_sum)
+                cur_sum = 0
+
             x -= 1
             y += 1
 
@@ -167,16 +188,22 @@ def evaluate(self, state, color):
             diag_y_s += 1
 
         x,y = (diag_x_s,diag_y_s)
-        diag_max_sum_ul = max(diag_max_sum_ul, cur_total)
+        diag_max_sum_ul = max(cur_max, cur_sum, diag_max_sum_ul)
 
     # down right
     diag_x_s, diag_y_s = (len(state.board[0])-1,0)
     x,y = (diag_x_s,diag_y_s)
     for z in range(diag_count):
-        cur_total = 0
+        cur_max = 0
+        cur_sum = 0
+
         while(x <= len(state.board[0])-1 and y <= len(state.board) - 1):
             if state.board[y][x] == color:
-                cur_total += 1
+                cur_sum += 1
+            else:
+                cur_max = max(cur_max,cur_sum)
+                cur_sum = 0
+
             x += 1
             y += 1
 
@@ -186,7 +213,7 @@ def evaluate(self, state, color):
             diag_y_s += 1
 
         x,y = (diag_x_s,diag_y_s)
-        diag_max_sum_dr = max(diag_max_sum_dr, cur_total)
+        diag_max_sum_dr = max(diag_max_sum_dr, cur_max, cur_sum)
 
     return (float(max(diag_max_sum_dr, diag_max_sum_ul, max_col_sum, 
         max_row_sum))/state.K)
