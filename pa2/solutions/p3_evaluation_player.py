@@ -1,13 +1,18 @@
 # -*- coding: utf-8 -*-
-__author__ = 'Sivasubramanian Chandrasegarampillai, Walter Curnow'
-__email__ = 'rchandra@uci.edu,wcurnow@uci.edu'
+__author__ = 'Rene Sanchez, Chris Weller'
+__email__ = 'risanche@ucsd.edu,chriskweller@gmail.com'
 
-import heapq
+# CSE 150 Assignment #2, Problem 3
+# Description: Player class that uses the longest streak evaluation function to determine
+# the best heuristic output possible to move to play in an mxn tic-tac-toe board.
 
 from assignment2 import Player
 
-
+# Evaluation Player class utilizes the supplied move function along with our 
+# evaluation heuristic to make the best possible move we have available
 class EvaluationPlayer(Player):
+
+    # Supplied move function that handles the determination of the best move possible
     def move(self, state):
         """Calculates the best move after 1-ply look-ahead with a simple evaluation function.
 
