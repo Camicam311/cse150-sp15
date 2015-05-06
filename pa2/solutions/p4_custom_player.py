@@ -28,7 +28,9 @@ def AlphaBeta(self, state, limit):
         state (State): The current state of the board.
     '''
     global move
+    global winningMove
     move = None
+    winningMove = False
     prevScore = 0
 
     tTable = defaultdict(lambda: None)         #Transposition table
@@ -66,7 +68,7 @@ def AlphaBeta(self, state, limit):
 
                     if score > current_best:
                         current_best = score
-                        move = poss
+                        move = (poss, score)
 
             else:                     # Minimize for them
                 current_best = 2
@@ -85,7 +87,7 @@ def AlphaBeta(self, state, limit):
 
                     if score < current_best:
                         current_best = score
-                        move = poss
+                        move = (poss,score)
 
             return current_best
 
@@ -221,12 +223,16 @@ class Seabiscuit(Player):
         while not (self.is_time_up() and self.feel_like_thinking()):
             # Do some thinking here
             my_move = self.do_the_magic(state,limit)
+            if(my_move[1] >= 0.7):
+                print("Returning winning move")
+                return my_move[0]
             limit += 1
+            print(my_move[1])
 
         # Time's up, return your move
         # You should only do a small amount of work here, less than one second.
         # Otherwise a random move will be played!
-        return my_move
+        return my_move[0]
 
     def feel_like_thinking(self):
         # You can code here how long you want to think perhaps.
