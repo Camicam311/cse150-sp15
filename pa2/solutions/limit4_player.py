@@ -199,14 +199,14 @@ def evaluate(self, state, color):
     return (float(max(diag_max_sum_dr, diag_max_sum_ul, max_col_sum, 
         max_row_sum))/state.K)
 
-class Seabiscuit(Player):
+class Limit4(Player):
     global _move
     _move = None
 
     @property
     def name(self):
         """Returns the name of this agent. Try to make it unique!"""
-        return 'Seabiscuit'
+        return 'Limit4'
 
     def move(self, state):
         """Calculates the absolute best move from the given board position using magic.
@@ -220,7 +220,7 @@ class Seabiscuit(Player):
         my_move = state.actions()[0]
 
         limit = 1
-        while not (self.is_time_up() and self.feel_like_thinking()):
+        while not (self.is_time_up() and self.feel_like_thinking() and limit >= 5):
             # Do some thinking here
             my_move = self.do_the_magic(state,limit)
             if(my_move[1] == 1.0 or my_move[1] == -1.0):
@@ -241,4 +241,3 @@ class Seabiscuit(Player):
     def do_the_magic(self, state, limit):
 
         return make_move(self,state,limit)
-

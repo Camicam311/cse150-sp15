@@ -56,7 +56,7 @@ class AlphaBetaPlayer(Player):
                             tTable[state] = score
 
                         if score >= beta:
-                            return score
+                            return tTable[state]
 
                         alpha = max(score, alpha)
 
@@ -75,7 +75,7 @@ class AlphaBetaPlayer(Player):
                             tTable[state] = score
 
                         if score <= alpha:
-                            return score
+                            return tTable[state]
 
                         beta = min(score, beta)
 
