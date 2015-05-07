@@ -91,42 +91,42 @@ class AlphaBetaPlayer(Player):
 
         #tTable[state] = True
         '''
-        global move
-        move = None
         def alpha_beta_search(state):
-            print max_value(state, float("-inf"), float("inf"))
-            print move
+            v = float("-inf")
+            for a in state.actions():
+                res = max_value(state.result(a), float("-inf"), float("inf"))
+                if res > v:
+                    v = res
+                    move = a
+                    print "move",a
             return move
 
         def max_value(state, alpha, beta):
-            global move
 
             if state.is_terminal():
                 return state.utility(self)
             v = float("-inf")
             for a in state.actions():
-                temp_min = min_value(state.result(a), alpha, beta)
-                if temp_min > v:
-                    v = temp_min
-                    move = a
-                #v = max(v, min_value(state.result(a), alpha, beta))
+                #temp_min = min_value(state.result(a), alpha, beta)
+                #if temp_min > alpha:
+                #    alpha = temp_min
+                v = max(v, min_value(state.result(a), alpha, beta))
                 if v >= beta:
                     return v
                 alpha = max(alpha, v)
             return v
         
         def min_value(state, alpha, beta):
-            global move
 
             if state.is_terminal():
                 return state.utility(self)
             v = float("inf")
             for a in state.actions():
-                temp_max = max_value(state.result(a), alpha, beta)
-                if temp_max < v:
-                    v = temp_max
-                    move = a
-                #v = min(v, max_value(state.result(a), alpha, beta))
+                #temp_max = max_value(state.result(a), alpha, beta)
+                #if temp_max < v:
+                #    v = temp_max
+                #    move = a
+                v = min(v, max_value(state.result(a), alpha, beta))
                 if v <= alpha:
                     return v
                 beta = min(beta, v)
