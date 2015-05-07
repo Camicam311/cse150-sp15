@@ -28,6 +28,7 @@ class AlphaBetaPlayer(Player):
 
         def max_value(state, alpha, beta):
             if tTable[state]:
+                #print "tTable returned early"
                 return tTable[state]
 
             if state.is_terminal():
@@ -38,12 +39,14 @@ class AlphaBetaPlayer(Player):
                 tTable[state] = max(tTable[state], v)
 
                 if v >= beta:
+                    #print "Pruning powers, activate!"
                     return v
                 alpha = max(alpha, v)
             return v
         
         def min_value(state, alpha, beta):
             if tTable[state]:
+                #print "tTable returned early"
                 return tTable[state]
 
             if state.is_terminal():
@@ -54,6 +57,7 @@ class AlphaBetaPlayer(Player):
                 tTable[state] = max(tTable[state], v)
 
                 if v <= alpha:
+                    #print "Pruning powers, activate!"
                     return v
                 beta = min(beta, v)
             return v
