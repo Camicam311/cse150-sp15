@@ -4,7 +4,6 @@ __email__ = 'rchandra@uci.edu,wcurnow@uci.edu'
 
 from assignment2 import Player, State, Action
 from collections import defaultdict
-
 class AlphaBetaPlayer(Player):
     def move(self, state):
         """Calculates the best move from the given board using the minimax 
@@ -23,6 +22,7 @@ class AlphaBetaPlayer(Player):
         '''
         Args:
             state (State): The current state of the board.
+        '''
         '''
         global move
         move = None
@@ -90,5 +90,46 @@ class AlphaBetaPlayer(Player):
                 return tTable[state]
 
         #tTable[state] = True
-        minimax_play(state,float("-inf"), float("inf"))
-        return move
+        '''
+        global move
+        move = None
+        def alpha_beta_search(state):
+            print max_value(state, float("-inf"), float("inf"))
+            print move
+            return move
+
+        def max_value(state, alpha, beta):
+            global move
+
+            if state.is_terminal():
+                return state.utility(self)
+            v = float("-inf")
+            for a in state.actions():
+                temp_min = min_value(state.result(a), alpha, beta)
+                if temp_min > v:
+                    v = temp_min
+                    move = a
+                #v = max(v, min_value(state.result(a), alpha, beta))
+                if v >= beta:
+                    return v
+                alpha = max(alpha, v)
+            return v
+        
+        def min_value(state, alpha, beta):
+            global move
+
+            if state.is_terminal():
+                return state.utility(self)
+            v = float("inf")
+            for a in state.actions():
+                temp_max = max_value(state.result(a), alpha, beta)
+                if temp_max < v:
+                    v = temp_max
+                    move = a
+                #v = min(v, max_value(state.result(a), alpha, beta))
+                if v <= alpha:
+                    return v
+                beta = min(beta, v)
+            return v
+
+        return alpha_beta_search(state)
