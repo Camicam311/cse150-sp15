@@ -94,11 +94,10 @@ class AlphaBetaPlayer(Player):
         def alpha_beta_search(state):
             v = float("-inf")
             for a in state.actions():
-                res = max_value(state.result(a), float("-inf"), float("inf"))
+                res = min_value(state.result(a), float("-inf"), float("inf"))
                 if res > v:
                     v = res
                     move = a
-                    print "move",a
             return move
 
         def max_value(state, alpha, beta):
