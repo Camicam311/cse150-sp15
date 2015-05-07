@@ -91,6 +91,7 @@ class AlphaBetaPlayer(Player):
 
         #tTable[state] = True
         '''
+
         def alpha_beta_search(state):
             v = float("-inf")
             for a in state.actions():
@@ -106,9 +107,6 @@ class AlphaBetaPlayer(Player):
                 return state.utility(self)
             v = float("-inf")
             for a in state.actions():
-                #temp_min = min_value(state.result(a), alpha, beta)
-                #if temp_min > alpha:
-                #    alpha = temp_min
                 v = max(v, min_value(state.result(a), alpha, beta))
                 if v >= beta:
                     return v
@@ -121,10 +119,6 @@ class AlphaBetaPlayer(Player):
                 return state.utility(self)
             v = float("inf")
             for a in state.actions():
-                #temp_max = max_value(state.result(a), alpha, beta)
-                #if temp_max < v:
-                #    v = temp_max
-                #    move = a
                 v = min(v, max_value(state.result(a), alpha, beta))
                 if v <= alpha:
                     return v
