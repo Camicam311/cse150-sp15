@@ -102,7 +102,6 @@ class AlphaBetaPlayer(Player):
             return move
 
         def max_value(state, alpha, beta):
-
             if state.is_terminal():
                 return state.utility(self)
             v = float("-inf")
@@ -114,7 +113,6 @@ class AlphaBetaPlayer(Player):
             return v
         
         def min_value(state, alpha, beta):
-
             if state.is_terminal():
                 return state.utility(self)
             v = float("inf")
