@@ -38,7 +38,6 @@ class AlphaBetaPlayer(Player):
                 tTable[state] = max(tTable[state], v)
 
                 if v >= beta:
-                    print "Pruning"
                     return v
                 alpha = max(alpha, v)
             return v
@@ -55,7 +54,6 @@ class AlphaBetaPlayer(Player):
                 tTable[state] = max(tTable[state], v)
 
                 if v <= alpha:
-                    print "Pruning"
                     return v
                 beta = min(beta, v)
             return v
