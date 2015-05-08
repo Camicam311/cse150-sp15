@@ -282,7 +282,7 @@ class Seabiscuit(Player):
         limit = 1                                           #current maximum depth that we will search
         while not (self.is_time_up() and self.feel_like_thinking()):
             my_move = self.do_the_magic(state,limit)
-            if(my_move[0] == 1.0 or my_move[0] == -1.0):    #The best move was either win or lose
+            if(my_move[0] >= 0.7):    #The best move was win
                 return my_move[1]
             limit += 1
 
