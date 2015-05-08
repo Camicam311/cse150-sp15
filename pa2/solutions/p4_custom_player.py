@@ -265,20 +265,24 @@ class Seabiscuit(Player):
     def move(self, state):
         my_move = state.actions()[0]
 
+        #Function that performs the next available move at the opposite corner of the board,
+        #and blocks the default moves on the upper-right corner every couple of plys to ensure
+        #that we win due to the fact that the opposing player can't search the board fast enough
+        #Input a "board" mxn state that may or may not have moves performed on it
+        #Output: The closest available move to the lower right corner of the board
         def specialStrategy(state):
-            if((state.ply)%4 != 0 and (state.ply) != 0):
+            if((state.ply)%4 != 0 and (state.ply) != 0):    #Perform a "block" move every couple of ply
                 return state.actions()[0]
-            for move in reversed(state.actions()):
+            for move in reversed(state.actions()):          #Perform the next available "opposite end" move
                 return move
 
-        if(state.M >= 6 and state.N >= 6):
+        if(state.M >= 7 and state.N >= 7):                  #if board is big enough for us to abuse time limit
             return specialStrategy(state)
 
-        limit = 1                               #current maximum depth that we will search
+        limit = 1                                           #current maximum depth that we will search
         while not (self.is_time_up() and self.feel_like_thinking()):
             my_move = self.do_the_magic(state,limit)
-            if(my_move[0] == 1.0 or my_move[0] == -1.0):            #The best move was either win or lose
-                #print("Found move")
+            if(my_move[0] == 1.0 or my_move[0] == -1.0):    #The best move was either win or lose
                 return my_move[1]
             limit += 1
 
