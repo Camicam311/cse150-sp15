@@ -16,6 +16,7 @@ from pprint import pprint
 # deepest depth to search for.
 #Output: A "move" object for the best move given the limit.
 def make_move(self, state, limit):
+    import sys
     global tTable
     tTable = defaultdict(lambda: None)         #Transposition table
 
@@ -264,11 +265,20 @@ class Seabiscuit(Player):
     def move(self, state):
         my_move = state.actions()[0]
 
+        def specialStrategy(state):
+            if((state.ply)%4 != 0 and (state.ply) != 0):
+                return state.actions()[0]
+            for move in reversed(state.actions()):
+                return move
+
+        if(state.M >= 6 and state.N >= 6):
+            return specialStrategy(state)
+
         limit = 1                               #current maximum depth that we will search
         while not (self.is_time_up() and self.feel_like_thinking()):
             my_move = self.do_the_magic(state,limit)
             if(my_move[0] == 1.0 or my_move[0] == -1.0):            #The best move was either win or lose
-                print("Found move")
+                #print("Found move")
                 return my_move[1]
             limit += 1
 
