@@ -39,14 +39,20 @@ class AlphaBetaPlayer(Player):
             v = float("-inf")
 
             # Iterate over every possible action from the current board state
+            #print "Actions length",len(state.actions())
+            #i = 0
             for a in state.actions():
 
                 # Keep updating "v" and move with the best possible scores and 
                 # and moves accordingly
                 res = min_value(state.result(a), float("-inf"), float("inf"))
+                #print "Action",i,"Res",res
                 if res > v:
                     v = res
                     move = a
+                #i += 1
+                if res == 1:
+                    break
 
             # Finally, return the best move found
             return move
