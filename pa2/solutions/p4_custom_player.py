@@ -10,6 +10,7 @@ __email__ = 'rchandra@uci.edu,wcurnow@uci.edu'
 from assignment2 import Player, State, Action
 from collections import defaultdict
 from pprint import pprint
+from math import floor
 
 #Function that holds and calls the main adversarial search algorithm.
 #Input: A board that may or may not have moves already performed on it, and integer limit for the
@@ -39,13 +40,13 @@ def make_move(self, state, limit):
     #Output: the utility for the best move performed
     def max_value(state, alpha, beta, depth):
         if tTable[state]:
-            return tTable[state]
+            return tTable[state]                    #We already visited this state
 
         depth += 1
         move = None
 
         if state.is_terminal() or depth >= limit:
-            other = 2 if state.to_play.color == 1 else 1
+            other = 2 if state.to_play.color == 1 else 1            #Determine our color and return correct utility
             them = evaluate(self, state, other)
             return them * -1 if state.to_play == self else them
 
@@ -65,12 +66,12 @@ def make_move(self, state, limit):
     #Output: the utility for the best move performed
     def min_value(state, alpha, beta, depth):
         if tTable[state]:
-            return tTable[state]
+            return tTable[state]                    #We already visited this state
 
         depth += 1
 
         if state.is_terminal() or depth >= limit:
-            other = 2 if state.to_play.color == 1 else 1
+            other = 2 if state.to_play.color == 1 else 1            #Determine our color and return correct utility
             them = evaluate(self, state, other)
             return them * -1 if state.to_play == self else them
 
@@ -271,13 +272,17 @@ class Seabiscuit(Player):
         #Input a "board" mxn state that may or may not have moves performed on it
         #Output: The closest available move to the lower right corner of the board
         def specialStrategy(state):
-            if((state.ply)%4 != 0 and (state.ply) != 0):    #Perform a "block" move every couple of ply
+            if((state.ply)%3 == 0 and (state.ply) != 0):    #Perform a "block" move every couple of ply
                 return state.actions()[0]
             for move in reversed(state.actions()):          #Perform the next available "opposite end" move
                 return move
 
         if(state.M >= 7 and state.N >= 7):                  #if board is big enough for us to abuse time limit
             return specialStrategy(state)
+
+        #Check if the board is empty, if true, do a move near the center. Saves time.
+        if(len(state.actions()) == state.M * state.N):
+            return state.actions()[(len(state.actions()))/2]
 
         limit = 1                                           #current maximum depth that we will search
         while not (self.is_time_up() and self.feel_like_thinking()):
