@@ -16,18 +16,20 @@ from pprint import pprint
 # deepest depth to search for.
 #Output: A "move" object for the best move given the limit.
 def make_move(self, state, limit):
+    global tTable
+    tTable = defaultdict(lambda: None)         #Transposition table
 
     #Customized alpha-beta algorithm that searches for the best possible move to make.
     #Input: A board that may or may not have moves already performed on it.
     #Output: A "move" object for the best move given the limit.
     def alpha_beta_search(state):
-        tTable = defaultdict(lambda: None)         #Transposition table
+        #tTable = defaultdict(lambda: None)         #Transposition table
         v = float("-inf")
         for a in state.actions():
             res = min_value(state.result(a), float("-inf"), float("inf"), 0)
             if res > v:                            #If we found a move with better utility
                 v = res
-                move = a
+                move = (v,a)
         return move
 
     #"Max" player algorithm that searches for the best available move to "maximize" our utility.
@@ -39,13 +41,16 @@ def make_move(self, state, limit):
             return tTable[state]
 
         depth += 1
+        move = None
 
         if state.is_terminal() or depth >= limit:
-            return state.utility(self)
+            other = 2 if state.to_play.color == 1 else 1
+            them = evaluate(self, state, other)
+            return them * -1 if state.to_play == self else them
 
         v = float("-inf")
         for a in state.actions():
-            v = max(v, min_value(state.result(a), alpha, beta))
+            v = max(v, min_value(state.result(a), alpha, beta, depth))
             tTable[state] = max(tTable[state], v)   #update transposition table values
 
             if v >= beta:                           #We can prune this branch
@@ -64,11 +69,13 @@ def make_move(self, state, limit):
         depth += 1
 
         if state.is_terminal() or depth >= limit:
-            return state.utility(self)
+            other = 2 if state.to_play.color == 1 else 1
+            them = evaluate(self, state, other)
+            return them * -1 if state.to_play == self else them
 
         v = float("inf")
         for a in state.actions():
-            v = min(v, max_value(state.result(a), alpha, beta))
+            v = min(v, max_value(state.result(a), alpha, beta, depth))
             tTable[state] = max(tTable[state], v)   #update transposition table values
 
             if v <= alpha:                          #We can prune this branch
@@ -260,11 +267,12 @@ class Seabiscuit(Player):
         limit = 1                               #current maximum depth that we will search
         while not (self.is_time_up() and self.feel_like_thinking()):
             my_move = self.do_the_magic(state,limit)
-            if(my_move[1] == 1.0 or my_move[1] == -1.0):            #The best move was either win or lose
-                return my_move[0]
+            if(my_move[0] == 1.0 or my_move[0] == -1.0):            #The best move was either win or lose
+                print("Found move")
+                return my_move[1]
             limit += 1
 
-        return my_move[0]
+        return my_move[1]
 
     #Ignore this, we don't really use it.
     def feel_like_thinking(self):
