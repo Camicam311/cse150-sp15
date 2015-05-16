@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-__author__ = 'Please write your names, separated by commas.'
-__email__ = 'Please write your email addresses, separated by commas.'
+__author__ = 'Rene Sanchez, Chris Weller'
+__email__ = 'risanche@ucsd.edu, chriskweller@gmail.com'
 
 
 def is_consistent(csp, variable, value):
@@ -11,5 +11,9 @@ def is_consistent(csp, variable, value):
     in csp.constraints), and the current assignment as Y=y, we want to check if the value x we want to assign to X
     violates the constraint c(x,y).  This method does not check c(x,Z), because Z is not yet assigned."""
 
-    # TODO implement this
-    pass
+    for cons in csp.constraints[variable]: #Iterate over neighbors of var
+
+        if cons.is_satisfied(value, cons.var2.value) == False: #If this variable's value breaks the
+            return False                                       # constraint with a neighbor
+
+    return True
