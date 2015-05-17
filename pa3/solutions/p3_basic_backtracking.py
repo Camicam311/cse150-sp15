@@ -30,7 +30,6 @@ def inference(csp, variable):
 
 def is_consistent(csp, variable, value):
     for cons in csp.constraints[variable]: #Iterate over neighbors of var
-        print cons
         if cons.var2.is_assigned():
             if cons.is_satisfied(value, cons.var2.value) == False: #If this variable's value breaks the
                 print "Bad ",value, " with ",cons.var2.value

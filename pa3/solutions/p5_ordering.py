@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
-__author__ = 'Sivasubramanian Chandrasegarampillai, Walter Curnow'
-__email__ = 'rchandra@uci.edu,wcurnow@uci.edu'
+__author__ = 'Rene Sanchez, Chris Weller'
+__email__ = 'risanche@ucsd.edu, chriskweller@gmail.com'
 
+from Queue import PriorityQueue
 
 def select_unassigned_variable(csp):
     """Selects the next unassigned variable, or None if there is no more unassigned variables
@@ -12,8 +13,6 @@ def select_unassigned_variable(csp):
     then it picks the variable that is involved in the largest number of constraints on other
     unassigned variables.
     """
-
-    # TODO implement this
     pass
 
 
@@ -24,6 +23,20 @@ def order_domain_values(csp, variable):
     This method implements the least-constraining-value (LCV) heuristic; that is, the values are
     ordered in the increasing order of the number choices for the neighboring variables in the constraint graph
     """
+    var = variable
+    q = PriorityQueue()
 
-    # TODO implement this
-    pass
+    for value in var.domain:
+        counter = 0
+        for cons in csp.constraints[var]: #Iterate over neighbors of var
+            if cons.var2.is_assigned():
+                if cons.is_satisfied(value, cons.var2.value) == True:
+                    counter += 1
+        q.put((counter, value))
+
+    orderedDomain = []
+    while(q.empty() == False):
+        prio, item = q.get()
+        orderedDomain.append(item)
+
+    return orderedDomain
