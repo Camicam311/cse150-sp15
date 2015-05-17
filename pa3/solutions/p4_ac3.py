@@ -3,6 +3,7 @@ __author__ = 'Rene Sanchez, Chris Weller'
 __email__ = 'risanche@ucsd.edu, chriskweller@gmail.com'
 
 from collections import deque
+from collections import defaultdict
 
 #Checks if there is a y in Dj that allows (x,y) to satisfy (Xi, Xj) constraint
 def no_value_salt_is_fries(csp, x, Xi, Xj):
@@ -13,6 +14,18 @@ def no_value_salt_is_fries(csp, x, Xi, Xj):
                 return True                                   # constraint with a neighbor
 
     return False
+
+def getNeighbors(Xi,csp):
+    neighbors = defaultdict(lambda: None)
+    for cons in csp.constraints[Xi]:
+        neighbors[cons.var2] = cons.var2
+
+    neighList = []
+    for var in neighbors:
+        neighList.append(var)
+
+    return neighList
+
 
 def ac3(csp, arcs=None):
     """Executes the AC3 or the MAC (p.218 of the textbook) algorithms.
@@ -34,7 +47,7 @@ def ac3(csp, arcs=None):
         if revise(csp,Xi,Xj):
             if len(Xi.domain) == 0:
                 return False
-            for Xk in csp.constraint[Xi] - Xj:
+            for Xk in getNeighbors(csp,Xi) - Xj:
                 queue_arcs.append(Xk, Xi)
 
     return True
