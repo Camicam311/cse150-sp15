@@ -12,8 +12,8 @@ def is_consistent(csp, variable, value):
     violates the constraint c(x,y).  This method does not check c(x,Z), because Z is not yet assigned."""
 
     for cons in csp.constraints[variable]: #Iterate over neighbors of var
-
-        if cons.is_satisfied(value, cons.var2.value) == False: #If this variable's value breaks the
-            return False                                       # constraint with a neighbor
+        if cons.var2.is_assigned():
+            if cons.is_satisfied(value, cons.var2.value) == False: #If this variable's value breaks the
+                return False                                       # constraint with a neighbor
 
     return True
