@@ -28,20 +28,26 @@ def inference(csp, variable):
     """
     return True
 
-def is_consistent(csp, variable, value):
+def is_consistent(csp, variable, val):
     for cons in csp.constraints[variable]: #Iterate over neighbors of var
-        if cons.var2.is_assigned():
-            if cons.is_satisfied(value, cons.var2.value) == False: #If this variable's value breaks the
-                print "Bad ",value, " with ",cons.var2.value
+        print "Size of domain ", cons.var2.domain
+        if cons.var2.domain == 1:
+            print "First if"
+            if cons.is_satisfied(val, cons.var2.value) == False: #If this variable's value breaks the
+                print "Bad ",val, " with ",cons.var2.value
                 return False                                       # constraint with a neighbor
+        else:
+            counter = 0
+            for value2 in cons.var2.domain:
+                if cons.is_satisfied(val, value2) == False:
+                    counter += 1
+            if counter == len(cons.var2.domain):
+                return False
 
-    print "Good ",  value, " with ",cons.var2.value
     return True
 
 
 def backtracking_search(csp):
-    global assignment
-    global assignComplete
 
     assignment = defaultdict(lambda: None)
     assignComplete = False
@@ -66,8 +72,6 @@ def is_complete(csp):
     return True
 
 def backtrack(csp):
-    global assignment
-    global assignComplete
     """Performs the backtracking search for the given csp.
 
     If there is a solution, this method returns the successful assignment; otherwise, it returns None.
@@ -84,11 +88,12 @@ def backtrack(csp):
         if is_consistent(csp, var, value):
             print "Got here"
             csp.variables.begin_transaction()
-            csp.variable[var] = value
+            #csp.variable[var] = value
+            csp.assignment[var] = value
 
             inferences = inference(csp, var)
             if inferences != False:
-                csp.variable[var] = value    #inferences isn't implemented, so this is just a dummy assignment
+                csp.assignment[var] = value    #inferences isn't implemented, so this is just a dummy assignment
                 result = backtrack(csp)
 
                 if result != "Failure":
