@@ -30,11 +30,9 @@ def inference(csp, variable):
 
 def is_consistent(csp, variable, val):
     for cons in csp.constraints[variable]: #Iterate over neighbors of var
-        print "Size of domain ", cons.var2.domain
+        #print "Size of domain ", len(cons.var2.domain)
         if cons.var2.domain == 1:
-            print "First if"
             if cons.is_satisfied(val, cons.var2.value) == False: #If this variable's value breaks the
-                print "Bad ",val, " with ",cons.var2.value
                 return False                                       # constraint with a neighbor
         else:
             counter = 0
@@ -42,8 +40,10 @@ def is_consistent(csp, variable, val):
                 if cons.is_satisfied(val, value2) == False:
                     counter += 1
             if counter == len(cons.var2.domain):
+                #print "Accept"
                 return False
 
+    #print "Reject"
     return True
 
 
@@ -78,18 +78,23 @@ def backtrack(csp):
     """
 
     if is_complete(csp):
-        print "Finished"
+        #print "Finished"
         return csp.assignment
     var = select_unassigned_variable(csp)
+    #print "New var"
     for value in order_domain_values(csp, var):
-        print "New value"
-        print var
-        print value
+        #print "New value"
+        #print var
+        #print value
+        csp.variables.begin_transaction()
         if is_consistent(csp, var, value):
-            print "Got here"
+            #print "Got here"
             csp.variables.begin_transaction()
-            #csp.variable[var] = value
+
             csp.assignment[var] = value
+            var.is_assigned() == True
+            var.domain = []
+            var.domain.append(value)
 
             inferences = inference(csp, var)
             if inferences != False:
@@ -99,8 +104,10 @@ def backtrack(csp):
                 if result != "Failure":
                     return csp.assignment
 
+        csp.variables.rollback()
         csp.assignment[var] = None
 
+    #print("Backtrack")
     csp.variables.rollback()
     return "Failure"
 
