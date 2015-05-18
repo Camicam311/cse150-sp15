@@ -15,7 +15,7 @@ def no_value_salt_is_fries(csp, x, Xi, Xj):
 
     return False
 
-def getNeighbors(Xi,csp):
+def getNeighbors(csp,Xi):
     neighbors = defaultdict(lambda: None)
     for cons in csp.constraints[Xi]:
         neighbors[cons.var2] = cons.var2
@@ -44,11 +44,12 @@ def ac3(csp, arcs=None):
         Xi = pair[0]
         Xj = pair[1]
 
+        listXj = [Xj]
         if revise(csp,Xi,Xj):
             if len(Xi.domain) == 0:
                 return False
-            for Xk in getNeighbors(csp,Xi) - Xj:
-                queue_arcs.append(Xk, Xi)
+            for Xk in list(set(getNeighbors(csp,Xi)) - set(listXj)):
+                queue_arcs.append((Xk, Xi))
 
     return True
 
