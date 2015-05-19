@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+#CSE 150 programming assignment 3, problem 6
+#Description: Series of methods that have been previously implemented in p1-p5 put together in a single file, when
+# combined, they are capable of solving constraint satisfaction problems effectively. In this case, a Futoshoki game.
 __author__ = 'Please write your names, separated by commas.'
 __email__ = 'Please write your email addresses, separated by commas.'
 

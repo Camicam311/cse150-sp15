@@ -1,115 +1,72 @@
 # -*- coding: utf-8 -*-
+#CSE 150 programming assignment 3, problem 3
+#Description: Implementation of the backtracking search algorithm, which recursively looks for a correct configuration
+# of variable-value pairings that solves the csp, and backtracks to earlier states when a variable is not assignable.
+# This algorithm is used in the final implementation of the game solver.
 __author__ = 'Rene Sanchez, Chris Weller'
 __email__ = 'risanche@ucsd.edu, chriskweller@gmail.com'
 
 from collections import defaultdict
+from p1_is_complete import is_complete
+from p2_is_consistent import is_consistent
 
+#Method that selectsthe next unassigned variable, or None if there is no more unassigned variables
+#    (i.e. the assignment is complete)
 def select_unassigned_variable(csp):
-    """Selects the next unassigned variable, or None if there is no more unassigned variables
-    (i.e. the assignment is complete).
-
-    For P3, *you do not need to modify this method.*
-    """
     return next((variable for variable in csp.variables if not variable.is_assigned()))
 
-
+#Method that returns a list of (ordered) domain values for the given variable.
 def order_domain_values(csp, variable):
-    """Returns a list of (ordered) domain values for the given variable.
-
-    For P3, *you do not need to modify this method.*
-    """
     return [value for value in variable.domain]
 
-
+#Method that performs an inference procedure for the variable assignment. For this implementation of
+# the backtracking search algorithm, we always assume that this returns True.
 def inference(csp, variable):
-    """Performs an inference procedure for the variable assignment.
-
-    For P3, *you do not need to modify this method.*
-    """
     return True
 
-def is_consistent(csp, variable, val):
-    for cons in csp.constraints[variable]: #Iterate over neighbors of var
-        #print "Size of domain ", len(cons.var2.domain)
-        if cons.var2.domain == 1:
-            if cons.is_satisfied(val, cons.var2.value) == False: #If this variable's value breaks the
-                return False                                       # constraint with a neighbor
-        else:
-            counter = 0
-            for value2 in cons.var2.domain:
-                if cons.is_satisfied(val, value2) == False:
-                    counter += 1
-            if counter == len(cons.var2.domain):
-                #print "Accept"
-                return False
-
-    #print "Reject"
-    return True
-
-
+#Entry method for the CSP fsolve. This method calls the backtrack method to solve the given csp.
+#Input: A csp to solve.
+#Output: If the csp has a solution, returns a dictionary of variable -> value of the solution. Otherwise, None.
 def backtracking_search(csp):
 
-    assignment = defaultdict(lambda: None)
-    assignComplete = False
-
-    """Entry method for the CSP solver.  This method calls the backtrack method to solve the given CSP.
-
-    If there is a solution, this method returns the successful assignment (a dictionary of variable to value);
-    otherwise, it returns None.
-
-    For P3, *you do not need to modify this method.*
-    """
-    if backtrack(csp):
+    if backtrack(csp):              #if csp has a solution
         return csp.assignment
     else:
         return None
 
-def is_complete(csp):
-
-    for variable in csp.variables:
-        if variable.is_assigned() == False:
-            return False
-    return True
-
+#Method that performs the Backtracking search algorithm on a given csp.
+#Input: a csp to solve.
+#Output: True if a solution to the csp is found, None otherwise.
 def backtrack(csp):
-    """Performs the backtracking search for the given csp.
 
-    If there is a solution, this method returns the successful assignment; otherwise, it returns None.
-    """
+    if is_complete(csp):                            #if all variables in csp are assigned
+        return True
+    var = select_unassigned_variable(csp)           #Get an unassigned variable from the csp
+    for value in order_domain_values(csp, var):     #Iterate over values of the unassigned variable
 
-    if is_complete(csp):
-        #print "Finished"
-        return csp.assignment
-    var = select_unassigned_variable(csp)
-    #print "New var"
-    for value in order_domain_values(csp, var):
-        #print "New value"
-        #print var
-        #print value
-        csp.variables.begin_transaction()
-        if is_consistent(csp, var, value):
-            #print "Got here"
-            csp.variables.begin_transaction()
+        csp.variables.begin_transaction()           #Save your game (in case of incorrect value is chosen)
 
-            csp.assignment[var] = value
+        if is_consistent(csp, var, value):          #Value doesn't violate any constraint with any neighbor
+
+            csp.variables.begin_transaction()       #Save your game again again (needed)
+
+            csp.assignment[var] = value             #update our dictionary
             var.is_assigned() == True
             var.domain = []
-            var.domain.append(value)
+            var.domain.append(value)                #Have the value be the only element in var's domain
 
             inferences = inference(csp, var)
             if inferences != False:
-                csp.assignment[var] = value    #inferences isn't implemented, so this is just a dummy assignment
+                csp.assignment[var] = value         #inferences isn't implemented, so this is just a dummy assignment
                 result = backtrack(csp)
 
-                if result != "Failure":
-                    return csp.assignment
+                if result == True:                  #We found a completed csp
+                    return True
 
-        csp.variables.rollback()
-        csp.assignment[var] = None
+        csp.variables.rollback()                    #Load the game (revert changes to csp variables and domains)
 
-    #print("Backtrack")
-    csp.variables.rollback()
-    return "Failure"
+    csp.variables.rollback()                        #csp has no solution, revert changes we have made to csp
+    return None
 
 
 

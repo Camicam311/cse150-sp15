@@ -1,18 +1,19 @@
 # -*- coding: utf-8 -*-
+#CSE 150 programming assignment 3, problem 1
+#Description: Implementation of the is_complete method, which checks whetherr a csp has been
+# solved or not. This method is used in the final implementation of the game solver.
 __author__ = 'Rene Sanchez, Chris Weller'
 __email__ = 'risanche@ucsd.edu, chriskweller@gmail.com'
 
 from assignment3 import *
 
+#Method that checks whether a constraint satisfaction problem has been "solved"
+#Input: A constraint satisfaction problem [Variables, values, constraints]
+#Output: Returns True when the CSP assignment is complete, i.e. all of the variables in the CSP have values assigned,
 def is_complete(csp):
-    """Returns True when the CSP assignment is complete, i.e. all of the variables in the CSP have values assigned."""
 
-    # Hint: The list of all variables for the CSP can be obtained by csp.variables.
-    # Also, if the variable is assigned, variable.is assigned() will be True.
-    # (Note that this can happen either by explicit assignment using variable.assign(value),
-    # or when the domain of the variable has been reduced to a single value.)
     for variable in csp.variables:
-        if variable.is_assigned() == False:
-            return False
+        if variable.is_assigned() == False:   #variable's domain isn't reduced to a single value, and
+            return False                      #doens't have a specific value assigned to it
 
     return True

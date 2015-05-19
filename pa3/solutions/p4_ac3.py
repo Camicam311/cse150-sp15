@@ -1,63 +1,75 @@
 # -*- coding: utf-8 -*-
+#CSE 150 programming assignment 3, problem 4
+#Description: Implementation of the AC-3 (forward checking) algorithm, which updates the domains of variables as
+# variables are assigned, and determines if a constraint has been violated ahead of time.
+# This algorithm is used in the final implementation of the game solver.
 __author__ = 'Rene Sanchez, Chris Weller'
 __email__ = 'risanche@ucsd.edu, chriskweller@gmail.com'
 
 from collections import deque
 from collections import defaultdict
 
-#Checks if there is a y in Dj that allows (x,y) to satisfy (Xi, Xj) constraint
-def no_value_salt_is_fries(csp, x, Xi, Xj):
-    foundValue = False
-    for cons in csp.constraints[Xi]: #Iterate over neighbors of var
-        if cons.var2 == Xj and cons.var2.is_assigned():
-            if cons.is_satisfied(x, cons.var2.value) == True: #If this variable's value satisfies the
-                return True                                   # constraint with a neighbor
+#Method that checks if there is no y in Dj that allows values (x,y) to satisfy a (Xi, Xj) variable constraint
+#Input: a csp, a value x in the domain of variable Xi, variable Xi, variable Xj. where both variables are members
+#   of the given csp.
+#Output: True if the is no value that satisfies any constraint (Xi,Xj) for x, False otherwise
+def no_value_satisfies(csp, x, Xi, Xj):
 
-    return False
+    for cons in csp.constraints[Xi]:                                #Iterate over neighbors of var
+        if cons.var2 == Xj:                                         #If we are looking at (Xi,Xj) constraints
+            if cons.var2.is_assigned():
+                if cons.is_satisfied(x, cons.var2.value) == True:   #The value does satisfy
+                    return False
+            else:
+                for y in cons.var2.domain:                          #Iterate over Xj values
+                    if cons.is_satisfied(x,y) == True:              #A value does satisfy
+                        return False
 
+    return True
+
+#Method that returns a list of neighbor variables for a variable Xi
+#Input: A csp, a variable Xi that is a member of said csp.
+#Output a list of variables that Xi shares a constraint with.
 def getNeighbors(csp,Xi):
-    neighbors = defaultdict(lambda: None)
+    neighbors = defaultdict(lambda: None)                   #Use a dictionary to store individual variables
+                                                            # b/c there may be more than 1 constraint per var
     for cons in csp.constraints[Xi]:
-        neighbors[cons.var2] = cons.var2
+        neighbors[cons.var2] = cons.var2                    #Record neighbor variable
 
     neighList = []
     for var in neighbors:
-        neighList.append(var)
+        neighList.append(var)                               #Add neighbor variables to a list
 
     return neighList
 
-
+#Method that performs the AC-3 (forward checking) algorithm on a csp.
+#Input: A csp, a boolean variable that decides whether the algorithm runs normal AC-3 on the csp,
+# otherwise it starts with only the arcs present in the 'arc' param in the queue
+#Output: True if the arc consistency check succeeds, False otherwise.
 def ac3(csp, arcs=None):
-    """Executes the AC3 or the MAC (p.218 of the textbook) algorithms.
 
-    If the parameter 'arcs' is None, then this method executes AC3 - that is, it will check the arc consistency
-    for all arcs in the CSP.  Otherwise, this method starts with only the arcs present in the 'arcs' parameter
-    in the queue.
-
-    Note that the current domain of each variable can be retrieved by 'variable.domains'.
-
-    This method returns True if the arc consistency check succeeds, and False otherwise."""
-
-    queue_arcs = deque(arcs if arcs is not None else csp.constraints.arcs())
+    queue_arcs = deque(arcs if arcs is not None else csp.constraints.arcs())    #contains (var1,var2) pairings
     while(queue_arcs):
         pair = queue_arcs.pop()
         Xi = pair[0]
         Xj = pair[1]
 
-        listXj = [Xj]
-        if revise(csp,Xi,Xj):
+        listXj = [Xj]                           #create a set containing just the Xj variable
+        if revise(csp,Xi,Xj):                   #If we find values in Xi's domain that don't satisfy (Xi,Xj)
             if len(Xi.domain) == 0:
-                return False
-            for Xk in list(set(getNeighbors(csp,Xi)) - set(listXj)):
-                queue_arcs.append((Xk, Xi))
+                return False                    #csp has no solution with current configuration
+            for Xk in list(set(getNeighbors(csp,Xi)) - set(listXj)):        #iterate over neighbors of Xi that aren't Xj
+                queue_arcs.append((Xk, Xi))     #Add variables with reduced domain to queue
 
     return True
 
+#Helper method of ac3 that removes all elements from Xi's domain that don't satisfy (Xi,Xj) constraints
+#Input: A csp, a variable Xi in the csp, another variable Xj in the csp
 def revise(csp, Xi, Xj):
-    # You may additionally want to implement the 'revise' method.
+
     revised = False
     for x in Xi.domain:
-        if no_value_salt_is_fries(csp, x, Xi, Xj):
+        if no_value_satisfies(csp, x, Xi, Xj):      #value x doesn't satisfy (Xi,Xj) constraints
             Xi.domain.remove(x)
             revised = True
 
