@@ -90,6 +90,6 @@ def order_domain_values(csp, variable):
     orderedDomain = []
     while(q.empty() == False):
         counter, value = q.get()
-        orderedDomain.append(value)                                      #add elements of queue to a list
+        orderedDomain.insert(0,value)                                      #add elements of queue to a list
                                                                          # with correct ordering
     return orderedDomain
