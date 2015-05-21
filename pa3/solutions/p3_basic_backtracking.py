@@ -7,8 +7,40 @@ __author__ = 'Rene Sanchez, Chris Weller'
 __email__ = 'risanche@ucsd.edu, chriskweller@gmail.com'
 
 from collections import defaultdict
-from p1_is_complete import is_complete
-from p2_is_consistent import is_consistent
+
+### Problem 1 and Problem 2 code ###
+
+#Method that checks whether a constraint satisfaction problem has been "solved"
+#Input: A constraint satisfaction problem [Variables, values, constraints]
+#Output: Returns True when the CSP assignment is complete, i.e. all of the variables in the CSP have values assigned,
+def is_complete(csp):
+
+    for variable in csp.variables:
+        if variable.is_assigned() == False:   #variable's domain isn't reduced to a single value, and
+            return False                      #doens't have a specific value assigned to it
+
+    return True
+
+#Checks if a value pertaining to a specific variable violates any constraits  regarding that variable.
+#Input: A constraint satisfaction problem to check for violations, a variable in said csp, and a value of said variable
+#Output: Returns True when the variable assignment to value is consistent, False otherwise
+def is_consistent(csp, variable, value):
+
+    for cons in csp.constraints[variable]:          #Iterate over neighbors of var
+        if cons.var2.domain == 1:                   #var2 is a neighbor variable that we have a constraint with
+            if cons.is_satisfied(value, cons.var2.value) == False: #If this variable's value breaks the
+                return False                                       # constraint with a neighbor
+        else:                                       #var2 isn't assigned yet, check all of its values
+            counter = 0
+            for value2 in cons.var2.domain:
+                if cons.is_satisfied(value, value2) == False:
+                    counter += 1
+            if counter == len(cons.var2.domain):    #If value violated the constraint for entire domain of var2
+                return False
+
+    return True                                     #value satisfied constraint for at-least 1 value in all neighbors
+
+### End of Problem 1 and Problem 3 code ###
 
 #Method that selectsthe next unassigned variable, or None if there is no more unassigned variables
 #    (i.e. the assignment is complete)
