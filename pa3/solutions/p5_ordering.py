@@ -52,6 +52,20 @@ def select_unassigned_variable(csp):
     unassigned_vars = filter(lambda x: not x.is_assigned(),csp.variables)
     mrv_vars = filter(lambda x:len(x.domain) == len(min(unassigned_vars,key=lambda x:len(x.domain)).domain),unassigned_vars)
 
+    gt = -1
+    res = None
+    for var in mrv_vars:
+        x = len(csp.constraints[var])
+        for o_var in unassigned_vars:
+            if o_var == var: continue
+            o_x = len(csp.constraints[var,o_var])
+            if x + o_x > gt:
+                gt = x+o_x
+                res = var
+                print var.domain
+    return res 
+
+    '''
     q = PriorityQueue()
     for var in csp.variables:
         if not var.is_assigned:
@@ -66,6 +80,7 @@ def select_unassigned_variable(csp):
         return var
     else:                                                       #There were no unassigned variables in csp
         return None
+    '''
 
 #Method that returns a list of (ordered) domain values for a given variable by the least-constraining-value heurisitc,
 # that is, the values are ordered in the incresing order of the number of choices for the neighboring variables in

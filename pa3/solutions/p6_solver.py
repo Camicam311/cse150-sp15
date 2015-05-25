@@ -49,6 +49,21 @@ def select_unassigned_variable(csp):
     unassigned_vars = filter(lambda x: not x.is_assigned(),csp.variables)
     mrv_vars = filter(lambda x:len(x.domain) == len(min(unassigned_vars,key=lambda x:len(x.domain)).domain),unassigned_vars)
 
+    gt = -1
+    res = None
+    for var in mrv_vars:
+        x = len(csp.constraints[var])
+        for o_var in unassigned_vars:
+            if o_var == var: continue
+            o_x = len(csp.constraints[var,o_var])
+            if x + o_x > gt:
+                gt = x+o_x
+                res = var
+                print var.domain
+    return res 
+    '''
+    print "SHUD"
+
     q = PriorityQueue()
     for var in csp.variables:
         counter = 0
@@ -63,6 +78,7 @@ def select_unassigned_variable(csp):
         return q.get()[2]
     else:
         return None
+    '''
 
 def is_consistent(csp, variable, val):
     for cons in csp.constraints[variable]: #Iterate over neighbors of var
