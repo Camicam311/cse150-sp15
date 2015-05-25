@@ -47,7 +47,8 @@ def select_unassigned_variable(csp):
     numCons = 0
 
     unassigned_vars = filter(lambda x: not x.is_assigned(),csp.variables)
-    mrv_vars = filter(lambda x:len(x.domain) == len(min(unassigned_vars,key=lambda x:len(x.domain)).domain),unassigned_vars)
+    mrv_vars = filter(lambda x:len(x.domain) == reduce(lambda x,y:
+      min(x,len(y.domain)),unassigned_vars),unassigned_vars)
 
     gt = -1
     res = None
@@ -59,8 +60,9 @@ def select_unassigned_variable(csp):
             if x + o_x > gt:
                 gt = x+o_x
                 res = var
-                print var.domain
+
     return res 
+
     '''
     print "SHUD"
 
