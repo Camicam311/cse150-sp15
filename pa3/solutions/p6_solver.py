@@ -16,30 +16,6 @@ def inference(csp, variable):
     """
     return ac3(csp, csp.constraints[variable].arcs())
 
-#Helper method for select_unassigned_variable, checks if a var-val combination violates
-# neighboring constraints.And returns by how much we should reduce our variable's domain by.
-#Input: A csp, a variable from said csp, a value from said variable
-#Output: 0 if the value doesn't violate any constraints, -1 otherwise.
-def get_available_domain(csp, variable, value):
-    global numCons
-
-    reduceDomainBy = 0
-
-    for cons in csp.constraints[variable]: #Iterate over neighbors of var
-        if cons.var2.domain == 1:
-            if cons.is_satisfied(value, cons.var2.value) == False:
-                reduceDomainBy = -1                                 #We can't use this value
-        else:
-            numCons += 1                                            #Xj in (Xi,Xj) is un-assigned, increase counter
-            counter = 0
-            for value2 in cons.var2.domain:
-                if cons.is_satisfied(value, value2) == False:
-                    counter += 1
-            if counter == cons.var2.domain:                         #This value violates every constraint in neighbor
-                reduceDomainBy = -1                                 #We can't use this value
-
-    return reduceDomainBy
-
 #Method that implements the minimum-remaining-values (MRV) and degree heuristic. That is,
 # the variable with the smallest number of values left in its available domain.
 #Input:A csp
@@ -59,6 +35,7 @@ def select_unassigned_variable(csp):
     unassigned_vars = filter(lambda x: not x.is_assigned(),csp.variables)
     mrv_vars = filter(lambda x:len(x.domain) == len(min(unassigned_vars,key=lambda x:len(x.domain)).domain),unassigned_vars)
 
+    '''
     gt = -1
     res = None
     for var in mrv_vars:
@@ -71,25 +48,8 @@ def select_unassigned_variable(csp):
                 res = var
                 #print var.domain
     return res 
-
     '''
-    print "SHUD"
-
-    q = PriorityQueue()
-    for var in csp.variables:
-        counter = 0
-        if var.is_assigned() == False:
-            counter = 0
-            for val in var.domain:
-                counter += get_available_domain(csp,var,val)
-        q.put((len(var.domain) + counter + 1, numCons, var))
-        numCons = 0
-
-    if(q):
-        return q.get()[2]
-    else:
-        return None
-    '''
+    return mrv_vars[0]
 
 #Checks if a value pertaining to a specific variable violates any constraits  regarding that variable.
 #Input: A constraint satisfaction problem to check for violations, a variable in said csp, and a value of said variable
@@ -114,7 +74,7 @@ def is_consistent(csp, variable, value):
 #Method that checks whether a constraint satisfaction problem has been "solved"
 #Input: A constraint satisfaction problem [Variables, values, constraints]
 #Output: Returns True when the CSP assignment is complete, i.e. all of the variables in the CSP have values assigned,
-def is_complete(csp):
+def is_complete(csp): 
 
     for variable in csp.variables:
         if variable.is_assigned() == False or len(variable.domain) != 1:   #variable doens't have a
@@ -127,7 +87,7 @@ def is_complete(csp):
 # the constraint graph
 #Input:A csp, a variable of said csp.
 #Output: an ordered list of variable's values, ordered according to LCV
-def order_domain_values(csp, variable):
+def order_domain_values(csp, variable): # Good
 
     var = variable
     q = PriorityQueue()
@@ -232,10 +192,9 @@ def getNeighbors(csp,Xi):
 #Helper method of ac3 that removes all elements from Xi's domain that don't satisfy (Xi,Xj) constraints
 #Input: A csp, a variable Xi in the csp, another variable Xj in the csp
 def revise(csp, Xi, Xj):
-
     revised = False
     for x in Xi.domain:
-        if no_value_satisfies(csp, x, Xi, Xj):      #value x doesn't satisfy (Xi,Xj) constraints
+        if len([csp.constraints[x,y] for y in Xj.domain]) == 0:
             Xi.domain.remove(x)
             revised = True
 
