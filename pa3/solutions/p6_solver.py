@@ -47,8 +47,8 @@ def select_unassigned_variable(csp):
     numCons = 0
 
     unassigned_vars = filter(lambda x: not x.is_assigned(),csp.variables)
-    mrv_vars = filter(lambda x:len(x.domain) == reduce(lambda x,y:
-      min(x,len(y.domain)),unassigned_vars),unassigned_vars)
+    shortest_len = reduce(lambda x,y: min(x,len(y.domain)),unassigned_vars)
+    mrv_vars = filter(lambda x:len(x.domain) == shortest_len, unassigned_vars)
 
     gt = -1
     res = None
