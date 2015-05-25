@@ -46,12 +46,15 @@ def select_unassigned_variable(csp):
     global numCons
     numCons = 0
 
+    unassigned_vars = filter(lambda x: not x.is_assigned(),csp.variables)
+    mrv_vars = filter(lambda x:len(x.domain) == len(min(unassigned_vars,key=lambda x:len(x.domain)).domain),unassigned_vars)
+
     q = PriorityQueue()
     for var in csp.variables:
         counter = 0
-        if var.is_assigned == False:
+        if var.is_assigned() == False:
             counter = 0
-            for val in val.domain:
+            for val in var.domain:
                 counter += get_available_domain(csp,var,val)
         q.put((len(var.domain) + counter + 1, numCons, var))
         numCons = 0

@@ -49,12 +49,14 @@ def select_unassigned_variable(csp):
     global numCons
     numCons = 0
 
+    unassigned_vars = filter(lambda x: not x.is_assigned(),csp.variables)
+    mrv_vars = filter(lambda x:len(x.domain) == len(min(unassigned_vars,key=lambda x:len(x.domain)).domain),unassigned_vars)
+
     q = PriorityQueue()
     for var in csp.variables:
-        badValues = 0
-        if var.is_assigned == False:                            #We are only looking for unassigned vars
+        if not var.is_assigned:
             badValues = 0
-            for val in val.domain:
+            for val in var.domain:
                 badValues += get_available_domain(csp,var,val)  #BadValues stores number of values that violate cons
         q.put((len(var.domain) - badValues + 1, numCons, var))  #Add (available values, num of cons, var) to queue
         numCons = 0
