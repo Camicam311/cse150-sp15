@@ -62,7 +62,7 @@ def select_unassigned_variable(csp):
             if x + o_x > gt:
                 gt = x+o_x
                 res = var
-                print var.domain
+                #print var.domain
     return res 
 
     '''

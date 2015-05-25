@@ -11,7 +11,7 @@ __email__ = 'risanche@ucsd.edu, chriskweller@gmail.com'
 def is_consistent(csp, variable, value):
 
     for cons in csp.constraints[variable]:          #Iterate over neighbors of var
-        if cons.var2.domain == 1:                   #var2 is a neighbor variable that we have a constraint with
+        if cons.var2.domain == 1 and cons.var2.is_assigned() == True:
             if cons.is_satisfied(value, cons.var2.value) == False: #If this variable's value breaks the
                 return False                                       # constraint with a neighbor
         else:                                       #var2 isn't assigned yet, check all of its values
@@ -19,7 +19,8 @@ def is_consistent(csp, variable, value):
             for value2 in cons.var2.domain:
                 if cons.is_satisfied(value, value2) == False:
                     counter += 1
-            if counter == len(cons.var2.domain):    #If value violated the constraint for entire domain of var2
-                return False
+
+            if counter >= len(cons.var2.domain):         #if value violated the constraint for entire domain of var2
+               return False
 
     return True                                     #value satisfied constraint for at-least 1 value in all neighbors

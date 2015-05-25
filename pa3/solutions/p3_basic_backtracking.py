@@ -16,8 +16,8 @@ from collections import defaultdict
 def is_complete(csp):
 
     for variable in csp.variables:
-        if variable.is_assigned() == False:   #variable's domain isn't reduced to a single value, and
-            return False                      #doens't have a specific value assigned to it
+        if variable.is_assigned() == False or len(variable.domain) != 1:   #variable doens't have a
+            return False                                                   #specific value assigned to it
 
     return True
 
@@ -27,7 +27,7 @@ def is_complete(csp):
 def is_consistent(csp, variable, value):
 
     for cons in csp.constraints[variable]:          #Iterate over neighbors of var
-        if cons.var2.domain == 1:                   #var2 is a neighbor variable that we have a constraint with
+        if cons.var2.domain == 1 and cons.var2.is_assigned() == True:
             if cons.is_satisfied(value, cons.var2.value) == False: #If this variable's value breaks the
                 return False                                       # constraint with a neighbor
         else:                                       #var2 isn't assigned yet, check all of its values
@@ -35,14 +35,15 @@ def is_consistent(csp, variable, value):
             for value2 in cons.var2.domain:
                 if cons.is_satisfied(value, value2) == False:
                     counter += 1
-            if counter == len(cons.var2.domain):    #If value violated the constraint for entire domain of var2
-                return False
+
+            if counter >= len(cons.var2.domain):         #if value violated the constraint for entire domain of var2
+               return False
 
     return True                                     #value satisfied constraint for at-least 1 value in all neighbors
 
-### End of Problem 1 and Problem 3 code ###
+### End of Problem 1 and Problem 2 code ###
 
-#Method that selectsthe next unassigned variable, or None if there is no more unassigned variables
+#Method that selects the next unassigned variable, or None if there is no more unassigned variables
 #    (i.e. the assignment is complete)
 def select_unassigned_variable(csp):
     return next((variable for variable in csp.variables if not variable.is_assigned()))
@@ -74,13 +75,11 @@ def backtrack(csp):
     if is_complete(csp):                            #if all variables in csp are assigned
         return True
     var = select_unassigned_variable(csp)           #Get an unassigned variable from the csp
-    for value in order_domain_values(csp, var):     #Iterate over values of the unassigned variable
+    for value in order_domain_values(csp, var):     #Iterate over values of the unassigned variab
 
         csp.variables.begin_transaction()           #Save your game (in case of incorrect value is chosen)
 
         if is_consistent(csp, var, value):          #Value doesn't violate any constraint with any neighbor
-
-            csp.variables.begin_transaction()       #Save your game again again (needed)
 
             csp.assignment[var] = value             #update our dictionary
             var.is_assigned() == True
@@ -97,7 +96,6 @@ def backtrack(csp):
 
         csp.variables.rollback()                    #Load the game (revert changes to csp variables and domains)
 
-    csp.variables.rollback()                        #csp has no solution, revert changes we have made to csp
     return None
 
 

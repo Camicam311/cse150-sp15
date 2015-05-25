@@ -13,7 +13,7 @@ from assignment3 import *
 def is_complete(csp):
 
     for variable in csp.variables:
-        if variable.is_assigned() == False:   #variable's domain isn't reduced to a single value, and
-            return False                      #doens't have a specific value assigned to it
+        if variable.is_assigned() == False or len(variable.domain) != 1:   #variable doens't have a
+            return False                                                   #specific value assigned to it
 
     return True
