@@ -29,26 +29,14 @@ def select_unassigned_variable(csp):
     then it picks the variable that is involved in the largest number of constraints on other
     unassigned variables.
     """
-    global numCons
-    numCons = 0
-
     unassigned_vars = filter(lambda x: not x.is_assigned(),csp.variables)
     mrv_vars = filter(lambda x:len(x.domain) == len(min(unassigned_vars,key=lambda x:len(x.domain)).domain),unassigned_vars)
 
-    '''
-    gt = -1
-    res = None
+    mv = -1
     for var in mrv_vars:
-        x = len(csp.constraints[var])
-        for o_var in unassigned_vars:
-            if o_var == var: continue
-            o_x = len(csp.constraints[var,o_var])
-            if x + o_x > gt:
-                gt = x+o_x
-                res = var
-                #print var.domain
-    return res 
-    '''
+        mv = max(mv,reduce(lambda x,y: max(x,len(csp.constraints[var]) + 
+            len(csp.constraints[var,y])),[x for x in unassigned_vars if x != var],0))
+
     return mrv_vars[0]
 
 #Checks if a value pertaining to a specific variable violates any constraits  regarding that variable.
@@ -206,17 +194,14 @@ def revise(csp, Xi, Xj):
 #Output: True if the arc consistency check succeeds, False otherwise.
 def ac3(csp, arcs=None):
 
-    queue_arcs = deque(arcs if arcs is not None else csp.constraints.arcs())    #contains (var1,var2) pairings
+    queue_arcs = deque(arcs if arcs else csp.constraints.arcs())    #contains (var1,var2) pairings
     while(queue_arcs):
-        pair = queue_arcs.pop()
-        Xi = pair[0]
-        Xj = pair[1]
+        (Xi, Xj) = queue_arcs.pop()
 
-        listXj = [Xj]                           #create a set containing just the Xj variable
         if revise(csp,Xi,Xj):                   #If we find values in Xi's domain that don't satisfy (Xi,Xj)
             if len(Xi.domain) == 0:
                 return False                    #csp has no solution with current configuration
-            for Xk in list(set(getNeighbors(csp,Xi)) - set(listXj)):        #iterate over neighbors of Xi that aren't Xj
+            for Xk in [x for x in getNeighbors(csp,Xi) if x != Xj]:
                 queue_arcs.append((Xk, Xi))     #Add variables with reduced domain to queue
 
     return True
