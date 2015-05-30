@@ -1,5 +1,8 @@
 # qlearningAgents.py
 # ------------------
+# Rene Sanchez A11866286 risanche@ucsd.edu
+# Chris Weller A10031853 chriskweller@gmail.com
+# ------------------
 # Licensing Information:  You are free to use or extend these projects for
 # educational purposes provided that (1) you do not distribute or publish
 # solutions, (2) you retain this notice, and (3) you provide clear
@@ -78,9 +81,6 @@ class QLearningAgent(ReinforcementAgent):
           take the best policy action otherwise.  Note that if there are
           no legal actions, which is the case at the terminal state, you
           should choose None as the action.
-
-          HINT: You might want to use util.flipCoin(prob)
-          HINT: To pick randomly from a list, use random.choice(list)
         """
         # Return action
         return random.choice(self.getLegalActions(state)) if util.flipCoin(
