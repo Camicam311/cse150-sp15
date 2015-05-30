@@ -1,21 +1,17 @@
-# valueIterationAgents.py
-# -----------------------
-# Licensing Information:  You are free to use or extend these projects for
-# educational purposes provided that (1) you do not distribute or publish
-# solutions, (2) you retain this notice, and (3) you provide clear
-# attribution to UC Berkeley, including a link to http://ai.berkeley.edu.
-# 
-# Attribution Information: The Pacman AI projects were developed at UC Berkeley.
-# The core projects and autograders were primarily created by John DeNero
-# (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
-# Student side autograding was added by Brad Miller, Nick Hay, and
-# Pieter Abbeel (pabbeel@cs.berkeley.edu).
-
+#CSE 150, programming assignemnt 4, question 1.
+# Rene Sanchez A11866286 risanche@ucsd.edu
+# Chris Weller A10031853 chriskweller@gmail.com
+# Description: Implementation of a Value Iteration algorithm that takes a 
+# Markov Decision Process as a problem to solve and runs a set amount of 
+# iterations and discount factor, returning the best policy obtained
+# after said amount of iterations.
 
 import mdp, util
 
 from learningAgents import ValueEstimationAgent
 
+#Class that determines the best policy for a given MDP, discount and number 
+# of iterations to test upon.
 class ValueIterationAgent(ValueEstimationAgent):
     """
         * Please read learningAgents.py before reading this.*
@@ -26,7 +22,7 @@ class ValueIterationAgent(ValueEstimationAgent):
         discount factor.
     """
 
-        
+    #Calculates the best policy by the use of the helper methods below
     def __init__(self, mdp, discount = 0.9, iterations = 100):
         """
           Your value iteration agent should take an mdp on
@@ -47,30 +43,30 @@ class ValueIterationAgent(ValueEstimationAgent):
 
         # Write value iteration code here
         "*** YOUR CODE HERE ***"
-        U = util.Counter()
+        U = util.Counter()                  #Set the dict = 0 for all entries
         counter = 0
         
-        while self.iterations > counter:
-            U = util.Counter()
+        while self.iterations > counter:    #while haven't done all iterations
+            U = util.Counter()              #Set the dict = 0 for all entries
             for s in self.mdp.getStates():
-                if self.mdp.isTerminal(s):
+                if self.mdp.isTerminal(s):  #At "end" state
                     U[s] = 0
                 else:
-                    prevQ = float('-inf')                    
+                    prevQ = float('-inf')   #Stores previously highest qVal
                     for action in self.mdp.getPossibleActions(s):
                         qVal = 0
                         for pair in self.mdp.getTransitionStatesAndProbs(s,action):
-                            tranState = pair[0]
-                            prob = pair[1]
+                            tranState = pair[0]     #state we move to
+                            prob = pair[1]          #probability of moving there
             
                             reward = self.mdp.getReward(s,action,tranState)
                             maxAction = (self.discount)*(self.values[tranState])
-                            qVal += prob*(reward + maxAction)
-                        
-                        U[s] = max(prevQ, qVal)
+                            qVal += prob*(reward + maxAction)   #Calculate Qvalue
+                                                                #using formula
+                        U[s] = max(prevQ, qVal)     #Store only the higuest Qval recorded
                         prevQ = U[s]
                         
-            self.values = U
+            self.values = U             #Update utility values for our agent
             counter +=1
 
     def getValue(self, state):
@@ -88,16 +84,14 @@ class ValueIterationAgent(ValueEstimationAgent):
         "*** YOUR CODE HERE ***"
         qVal = 0
         for pair in self.mdp.getTransitionStatesAndProbs(state,action):
-            tranState = pair[0]
-            prob = pair[1]
+            tranState = pair[0]     #state we move to
+            prob = pair[1]          #probability of moving to state
             
             reward = self.mdp.getReward(state,action,tranState)
             maxAction = (self.discount)*(self.values[tranState])
-            qVal += prob*(reward + maxAction)
+            qVal += prob*(reward + maxAction)   #Calculate Qvalue using formula
             
         return qVal
-        #return sum([prob*(self.mdp.getReward(state,action,tranState)) + self.discount*self.values[tranState] 
-        #for prob,tranState in self.mdp.getTransitionStatesAndProbs(state,action)])
             
          
     def computeActionFromValues(self, state):
@@ -111,16 +105,16 @@ class ValueIterationAgent(ValueEstimationAgent):
         """
         "*** YOUR CODE HERE ***"
         
-        currAction = float('-inf')
-        bestAction = None
+        currActionVal = float('-inf')   #Holds the Qval of current best action
+        bestAction = None               #Holds the best action found so far
         
-        if self.mdp.isTerminal(state):
+        if self.mdp.isTerminal(state):  #If we are at "end" square
             return None
         
         for action in self.mdp.getPossibleActions(state):
-            if self.getQValue(state,action) >= currAction:
-                bestAction = action
-                currAction = self.getQValue(state,action)
+            if self.getQValue(state,action) >= currActionVal: #found better action
+                bestAction = action                   #update best action found
+                currActionVal = self.getQValue(state,action)
                 
         return bestAction
         
