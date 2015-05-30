@@ -25,6 +25,8 @@ class ValueIterationAgent(ValueEstimationAgent):
         for a given number of iterations using the supplied
         discount factor.
     """
+
+        
     def __init__(self, mdp, discount = 0.9, iterations = 100):
         """
           Your value iteration agent should take an mdp on
@@ -45,7 +47,21 @@ class ValueIterationAgent(ValueEstimationAgent):
 
         # Write value iteration code here
         "*** YOUR CODE HERE ***"
-
+        U = util.Counter()
+        counter = 0
+        
+        while iterations > counter:
+            U = util.Counter()
+            for s in self.mdp.getStates():
+                if self.mdp.isTerminal(s):
+                    U[s] = 0
+                else:
+                    for action in self.mdp.getPossibleActions(s):
+                        U[s] = self.getQValue(s,action)
+                    
+            counter += 1
+            self.values = U
+            
 
     def getValue(self, state):
         """
@@ -60,8 +76,16 @@ class ValueIterationAgent(ValueEstimationAgent):
           value function stored in self.values.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
-
+        summation = 0
+        for pair in self.mdp.getTransitionStatesAndProbs(state,action):
+            prob = pair[1]
+            tranState = pair[0]
+            summation += prob*(self.mdp.getReward(state,action,tranState)) + self.discount*self.values[tranState]
+        return summation
+        #return sum([prob*(self.mdp.getReward(state,action,tranState)) + self.discount*self.values[tranState] 
+        #for prob,tranState in self.mdp.getTransitionStatesAndProbs(state,action)])
+            
+         
     def computeActionFromValues(self, state):
         """
           The policy is the best action in the given state
@@ -72,7 +96,21 @@ class ValueIterationAgent(ValueEstimationAgent):
           terminal state, you should return None.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        if self.mdp.isTerminal(state):
+            return None
+        
+        currBestAction = -9999999999999
+        bestAction = None
+        
+        for action in self.mdp.getPossibleActions(state):
+            if self.getQValue(state,action) >= currBestAction:
+                bestAction = action
+                currBestAction = self.getQValue(state,action)
+                
+        return bestAction
+        
+    def getQValue(self, state, action):
+        return self.computeQValueFromValues(state, action)
 
     def getPolicy(self, state):
         return self.computeActionFromValues(state)
@@ -80,6 +118,3 @@ class ValueIterationAgent(ValueEstimationAgent):
     def getAction(self, state):
         "Returns the policy at the state (no exploration)."
         return self.computeActionFromValues(state)
-
-    def getQValue(self, state, action):
-        return self.computeQValueFromValues(state, action)
