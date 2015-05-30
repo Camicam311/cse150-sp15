@@ -1,6 +1,8 @@
-#CSE 150, programming assignemnt 4, question 1.
+# CSE 150, valueIterationAgents.py
+# -----------------------------------------------
 # Rene Sanchez A11866286 risanche@ucsd.edu
 # Chris Weller A10031853 chriskweller@gmail.com
+# -----------------------------------------------
 # Description: Implementation of a Value Iteration algorithm that takes a 
 # Markov Decision Process as a problem to solve and runs a set amount of 
 # iterations and discount factor, returning the best policy obtained

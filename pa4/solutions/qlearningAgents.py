@@ -1,4 +1,4 @@
-# qlearningAgents.py
+# CSE 150, qlearningAgents.py
 # ------------------
 # Rene Sanchez A11866286 risanche@ucsd.edu
 # Chris Weller A10031853 chriskweller@gmail.com
@@ -43,6 +43,8 @@ class QLearningAgent(ReinforcementAgent):
     """
     def __init__(self, **args):
         ReinforcementAgent.__init__(self, **args)
+
+        # List of qvalues for states.
         self.qVals = util.Counter()
 
     def getQValue(self, state, action):
@@ -51,6 +53,7 @@ class QLearningAgent(ReinforcementAgent):
           Should return 0.0 if we have never seen a state
           or the Q node value otherwise
         """
+        # Return the associated qvalue.
         return self.qVals[(state,action)]
 
     def computeValueFromQValues(self, state):
@@ -60,6 +63,8 @@ class QLearningAgent(ReinforcementAgent):
           there are no legal actions, which is the case at the
           terminal state, you should return a value of 0.0.
         """
+        # Return the maximum qvalue computed from the list of legal actions,
+        # or 0.0 if there are none.
         return 0.0 if len(self.getLegalActions(state)) == 0 else max(
           self.getQValue(state,action) for action in self.getLegalActions(state))
 
@@ -69,6 +74,9 @@ class QLearningAgent(ReinforcementAgent):
           are no legal actions, which is the case at the terminal state,
           you should return None.
         """
+
+        # Filter through the legal actions from the current state, returning
+        # a random choice from a list of best actions, or None if applicable.
         return None if len(self.getLegalActions(state)) == 0 else \
           random.choice(filter(lambda action: self.getQValue(state,action) == \
           self.computeValueFromQValues(state),self.getLegalActions(state)))
@@ -82,7 +90,8 @@ class QLearningAgent(ReinforcementAgent):
           no legal actions, which is the case at the terminal state, you
           should choose None as the action.
         """
-        # Return action
+        # Return random action with probability epsilon, otherwise return the 
+        # best policy.
         return random.choice(self.getLegalActions(state)) if util.flipCoin(
           self.epsilon) else self.computeActionFromQValues(state)
             
@@ -95,6 +104,8 @@ class QLearningAgent(ReinforcementAgent):
           NOTE: You should never call this function,
           it will be called on your behalf
         """
+        # Update the qvalue from the associated state; formula gathered from 
+        # http://artint.info/html/ArtInt_265.html.
         self.qVals[(state,action)] = (1-self.alpha)*self.getQValue(state,action)+ \
           self.alpha*(reward + self.discount * self.getValue(nextState))
 
